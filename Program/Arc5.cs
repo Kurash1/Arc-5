@@ -21,7 +21,9 @@ namespace ArcInstance
             try
             {
 #endif
-            ArcTests.Tests.VariableTest(directory, this);
+            new Compiler(directory, this);
+            ArcTests.Tests.VariableTest();
+            ArcTests.Tests.InheritTest();
 #if !DEBUG
             }
             catch(Exception e) { Console.WriteLine(e.Message); };

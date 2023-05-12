@@ -44,6 +44,7 @@ namespace Arc
                 { "var", (Block.Enumerator i) => Var(i, (Block s) => Value.Parse(s) ) },
                 { "object", (Block.Enumerator i) => Var(i, (Block s) => new ArcObject(s) ) },
                 { "list", (Block.Enumerator i) => Var(i, (Block s) => new ArcList(s) ) },
+                { "inherit", (Block.Enumerator i) => Inherit(i) }
             };
 
             Block.Enumerator g = code.GetEnumerator();
