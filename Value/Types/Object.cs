@@ -82,19 +82,24 @@ public class ArcObject : Value
     {
         return !obj1.Equals(obj2);
     }
-    public override string ToString()
+    public override string ToString() => ToString(true);
+    public string ToString(bool CausesWarning = true)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append("{ ");
         foreach (KeyValuePair<string, Value> kvp in Properties)
         {
             if(kvp.Key != "global")
-                sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToString()} ");
+                if(kvp.Value.TypeCode == ValueTypeCode.Object)
+                    sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {((ArcObject)kvp.Value).ToString(false)} ");
+                else
+                    sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToString()} ");
         }
         sb.Append(" } ");
 
         string s = sb.ToString();
-        Console.WriteLine($"Warning: Trying to print object {s}".Pastel(ConsoleColor.Yellow));
+        if(!CausesWarning)
+            Console.WriteLine($"Warning: Trying to print object {s}".Pastel(ConsoleColor.Yellow));
         return s;
     }
 }

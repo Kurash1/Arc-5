@@ -36,7 +36,6 @@ int NumFromString = NumAsString
 object global:GlobalObject = {{
 
 }}
-FirstLayer
             ").Trim();
 
             ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
