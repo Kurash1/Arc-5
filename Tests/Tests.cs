@@ -9,6 +9,16 @@ using Arc;
 namespace ArcTests;
 public static partial class Tests
 {
+    public static void TypeAndInterfaceTest()
+    {
+        Compiler comp = new();
+
+        string result = comp.compile($@"
+type a = int
+        ").Trim();
+
+        Console.WriteLine("Success on Type And Interface Test");
+    }
     public static void VariableTest()
     {
         Compiler comp = new();

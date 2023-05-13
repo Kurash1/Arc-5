@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Arc;
-public enum LogicalScope
-{
-    AND,
-    OR,
-    NOT,
-    MAYBE
-}
 public enum ValueTypeCode
 {
     Bool,
