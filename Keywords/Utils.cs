@@ -113,14 +113,18 @@ public partial class Compiler
                 currentKey = KeyLocator[f];
                 if (currentDict.ContainsKey(currentKey))
                 {
-                    if (currentDict[currentKey].TypeCode == ValueTypeCode.Object)
+                    if (KeyLocator.Length > f + 1)
                     {
-                        currentDict = ((ArcObject)currentDict[currentKey]).Properties;
+                        if (currentDict[currentKey].TypeCode == ValueTypeCode.Object)
+                        {
+                            currentDict = ((ArcObject)currentDict[currentKey]).Properties;
+                        }
                     }
                 }
                 else
                 {
-                    throw new Exception($"Object {currentKey} did not exist");
+                    var = null;
+                    return false;
                 }
                 f++;
             } while (KeyLocator.Length > f);

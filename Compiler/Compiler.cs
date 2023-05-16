@@ -40,6 +40,7 @@ namespace Arc
                 { "int", (Block.Enumerator i) => Var(i, (Block s) => new ArcInt(s) ) },
                 { "var", (Block.Enumerator i) => Var(i, (Block s) => Value.Parse(s) ) },
                 { "object", (Block.Enumerator i) => Var(i, (Block s) => new ArcObject(s) ) },
+                { "interface", (Block.Enumerator i) => Var(i, (Block s) => new ArcInterface(s) ) },
                 { "list", (Block.Enumerator i) => Var(i, (Block s) => new ArcList(s) ) },
                 { "type", (Block.Enumerator i) => Var(i, (Block s) => new ArcType(s) ) },
                 { "inherit", (Block.Enumerator i) => Inherit(i) }

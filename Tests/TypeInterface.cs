@@ -12,6 +12,18 @@ public static partial class Tests
         Compiler comp = new();
 
         string result = comp.compile($@"
+interface country = {{
+  type name = string
+  type adj = string
+  type color = list
+}}
+country ade = {{
+  string name = ""Adelea""
+  string adj = ""Adelean""
+  list color = {{ 100 100 100 }}
+}}
+
+
 type a = bool
 type b = int
 type c = float

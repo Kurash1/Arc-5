@@ -47,9 +47,7 @@ public class ArcType : Value
     }
     public bool Equals(Value v)
     {
-        if (v.TypeCode != TypeCode)
-            return false;
-        return ((ArcType)v).Type == Type;
+        return v.TypeCode == Type;
     }
     public Block ToBlock()
     {
