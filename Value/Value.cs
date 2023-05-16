@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Arc;
-public enum LogicalScope
-{
-    AND,
-    OR,
-    NOT,
-    MAYBE
-}
 public enum ValueTypeCode
 {
     Bool,
@@ -21,7 +14,6 @@ public enum ValueTypeCode
     Interface,
     Type
 }
-
 public interface Value
 {
     ValueTypeCode TypeCode { get; }
@@ -50,6 +42,7 @@ public interface Value
     public bool Equals(Value v);
     public string ToString();
     public Block ToBlock();
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp);
     bool IsNumber() => (TypeCode == ValueTypeCode.Float || TypeCode == ValueTypeCode.Int);
 }
 

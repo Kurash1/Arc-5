@@ -27,6 +27,11 @@ public class ArcFloat : ArcNumber
     {
         return Value.ToString("0.000");
     }
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    {
+        result.Add(ToString());
+        return i;
+    }
     public double getNum() => Value;
     public static implicit operator double(ArcFloat d) => d.Value;
     public static implicit operator ArcFloat(double d) => new ArcFloat(d);

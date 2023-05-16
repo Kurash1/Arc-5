@@ -57,6 +57,10 @@ public class ArcList : Value
         string s = sb.ToString();
         return s;
     }
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    {
+        throw new NotImplementedException();
+    }
     public bool Equals(Value v)
     {
         if (v.TypeCode != TypeCode)

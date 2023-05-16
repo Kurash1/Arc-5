@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Pastel;
-namespace Arc;
 
-public class ArcObject : Value
+namespace Arc;
+public class ArcInterface : Value
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Object;
     public Dictionary<string, Value> Properties;
-    public ArcObject()
+    public ArcInterface()
     {
         Properties = new Dictionary<string, Value>();
     }
-    public ArcObject(Dictionary<string, Value> value)
+    public ArcInterface(Dictionary<string, Value> value)
     {
         Properties = value;
     }
-    public ArcObject(Block code)
+    public ArcInterface(Block code)
     {
         Properties = new Dictionary<string, Value>();
 
@@ -29,14 +28,40 @@ public class ArcObject : Value
         Compiler comp = new Compiler();
 
         comp.compile(code);
-        foreach(KeyValuePair<string, Value> kvp in comp.variables)
+        foreach (KeyValuePair<string, Value> kvp in comp.variables)
         {
             Properties.Add(kvp.Key, kvp.Value);
         }
     }
     public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
     {
-        throw new NotImplementedException();
+        Block.Enumerator g = comp.Var(i, (Block s) => new ArcObject(s));
+        i.MoveNext();
+        string baseKey = i.Current;
+        foreach(KeyValuePair<string, Value> kvp in Properties)
+        {
+            if(comp.TryGetVariable($"{baseKey}:{kvp.Key}", out Value value))
+            {
+                if (kvp.Value.TypeCode == ValueTypeCode.Type)
+                {
+                    if (!kvp.Value.Equals(value))
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
+            else
+            {
+                if(kvp.Value.TypeCode != ValueTypeCode.Type)
+                {
+                    var a = comp.GetNewVariable($"{baseKey}:{kvp.Key}");
+                    a.dict[a.key] = kvp.Value;
+                }
+                else
+                    throw new Exception();
+            }
+        }
+        return g;
     }
     public Value this[string key]
     {
@@ -52,16 +77,15 @@ public class ArcObject : Value
             Properties[key] = value;
         }
     }
-
     public bool Equals(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
-        foreach(KeyValuePair<string, Value> kvp in ((ArcObject)v).Properties)
+        foreach (KeyValuePair<string, Value> kvp in ((ArcInterface)v).Properties)
         {
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
-            if(!Properties[kvp.Key].Equals(kvp.Value))
+            if (!Properties[kvp.Key].Equals(kvp.Value))
                 return false;
         }
         return true;
@@ -70,7 +94,7 @@ public class ArcObject : Value
     {
         StringBuilder sb = new StringBuilder();
         sb.Append("{ ");
-        foreach(KeyValuePair<string, Value> kvp in Properties)
+        foreach (KeyValuePair<string, Value> kvp in Properties)
         {
             if (kvp.Key != "global")
                 sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToBlock()}");
@@ -78,16 +102,16 @@ public class ArcObject : Value
         sb.Append(" }");
         return Parser.ParseString(sb.ToString());
     }
-    public static bool operator ==(ArcObject obj1, Value obj2)
+    public static bool operator ==(ArcInterface obj1, Value obj2)
     {
         return obj1.Equals(obj2);
     }
-    public static bool operator !=(ArcObject obj1, Value obj2)
+    public static bool operator !=(ArcInterface obj1, Value obj2)
     {
         return !obj1.Equals(obj2);
     }
     public static string ToString()
     {
-        return "[Arc Object]";
+        return "[Arc Interface]";
     }
 }

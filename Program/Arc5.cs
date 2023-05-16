@@ -22,6 +22,7 @@ namespace ArcInstance
             {
 #endif
             new Compiler(directory, this);
+            ArcTests.Tests.TypeAndInterfaceTest();
             ArcTests.Tests.VariableTest();
             ArcTests.Tests.InheritTest();
 #if !DEBUG

@@ -11,13 +11,13 @@ namespace Arc
 {
     public partial class Compiler
     {
-        public Dictionary<string, Value> variables = new Dictionary<string, Value>()
+        public Dictionary<string, Value> variables = new()
         {
             { "global", global }
         };
         public static ArcObject global = new ArcObject();
-        public static string directory = null;
-        public static Instance owner = null;
+        public static string directory;
+        public static Instance owner;
         public Compiler(string directory, Instance owner)
         {
             Compiler.directory = directory;
@@ -27,11 +27,8 @@ namespace Arc
         {
 
         }
-        public string compile(string file)
-        {
-            return Low_compile(Parser.ParseString(file));
-        }
-        public string Low_compile(Block code)
+        public string compile(string file) => compile(Parser.ParseString(file));
+        public string compile(Block code)
         {
             
             List<string> result = new();
@@ -43,7 +40,9 @@ namespace Arc
                 { "int", (Block.Enumerator i) => Var(i, (Block s) => new ArcInt(s) ) },
                 { "var", (Block.Enumerator i) => Var(i, (Block s) => Value.Parse(s) ) },
                 { "object", (Block.Enumerator i) => Var(i, (Block s) => new ArcObject(s) ) },
+                { "interface", (Block.Enumerator i) => Var(i, (Block s) => new ArcInterface(s) ) },
                 { "list", (Block.Enumerator i) => Var(i, (Block s) => new ArcList(s) ) },
+                { "type", (Block.Enumerator i) => Var(i, (Block s) => new ArcType(s) ) },
                 { "inherit", (Block.Enumerator i) => Inherit(i) }
             };
 
@@ -56,11 +55,11 @@ namespace Arc
                     g = keywords[g.Current].Invoke(g);
                     continue;
                 }
-                else if (TryGetVariable(g.Current, out Value var))
+                else if (TryGetVariable(g.Current, out Value? variable))
                 {
-                    if(var != null)
+                    if(variable != null)
                     {
-                        result.Add(var.ToString());
+                        g = variable.Call(g, ref result, this);
                     }
                     continue;
                 }
