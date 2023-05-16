@@ -29,7 +29,22 @@ public class ArcType : Value
 
         Type = (ValueTypeCode)Enum.Parse(typeof(ValueTypeCode), vare);
     }
-
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    {
+        Dictionary<string, Func<Block.Enumerator, Block.Enumerator>> keywords = new()
+        {
+            { "string", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcString(s)) },
+            { "bool", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcBool(s)) },
+            { "float", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcFloat(s)) },
+            { "int", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcInt(s)) },
+            { "var", (Block.Enumerator i) => comp.Var(i, (Block s) => Value.Parse(s)) },
+            { "object", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcObject(s)) },
+            { "list", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcList(s)) },
+            { "type", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcType(s)) }
+        };
+        i = keywords[Type.ToString().ToLower()](i);
+        return i;
+    }
     public bool Equals(Value v)
     {
         if (v.TypeCode != TypeCode)

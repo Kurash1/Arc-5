@@ -47,6 +47,11 @@ public class ArcInt : ArcNumber
     {
         return Value.ToString();
     }
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    {
+        result.Add(ToString());
+        return i;
+    }
     public double getNum() => Value;
     public static implicit operator double(ArcInt d) => d.Value;
     public static implicit operator ArcInt(int d) => new ArcInt(d);

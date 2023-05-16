@@ -28,11 +28,15 @@ public class ArcObject : Value
 
         Compiler comp = new Compiler();
 
-        comp.Low_compile(code);
+        comp.compile(code);
         foreach(KeyValuePair<string, Value> kvp in comp.variables)
         {
             Properties.Add(kvp.Key, kvp.Value);
         }
+    }
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    {
+        throw new NotImplementedException();
     }
     public Value this[string key]
     {
