@@ -37,8 +37,8 @@ public class ArcType : Value
             { "bool", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcBool(s)) },
             { "float", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcFloat(s)) },
             { "int", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcInt(s)) },
-            { "var", (Block.Enumerator i) => comp.Var(i, (Block s) => Value.Parse(s)) },
             { "object", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcObject(s)) },
+            { "interface", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcInterface(s)) },
             { "list", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcList(s)) },
             { "type", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcType(s)) }
         };
