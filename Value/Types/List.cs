@@ -22,9 +22,8 @@ public class ArcList : Value
     {
         List = new();
 
-        if (!Parser.HasEnclosingBrackets(code))
-            throw new Exception("Object without enclosing brackets");
-        code = Compiler.RemoveEnclosingBrackets(code);
+        if (Parser.HasEnclosingBrackets(code))
+            code = Compiler.RemoveEnclosingBrackets(code);
 
         Block.Enumerator i = code.GetEnumerator();
         i.MoveNext();

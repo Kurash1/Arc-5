@@ -8,9 +8,10 @@ namespace Arc;
 
 public partial class Compiler
 {
-    public Block.Enumerator Var<T>(Block.Enumerator i, Func<Block,T> Constructor) where T : Value
+    public Block.Enumerator Var<T>(Block.Enumerator i, Func<Block,T> Constructor, bool move = true) where T : Value
     {
-        i.MoveNext(); //The previous spot is the datatype
+        if(move)
+            i.MoveNext(); //The previous spot is the datatype
 
         i = GetKeyValue(i, out string key, out Block value);
 
