@@ -41,6 +41,7 @@ FirstLayer:SecondLayer:hello = HelloGet
         ").Trim();
 
         ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
+                { "global", Compiler.global },
                 { "hello", new ArcString("\"World\"") },
                 { "true", new ArcBool(true) },
                 { "false", new ArcBool(false) },
@@ -65,7 +66,7 @@ FirstLayer:SecondLayer:hello = HelloGet
                 }) }
             });
 
-        if (!((ArcObject)comp.variables["FirstLayer"]).Equals(expected))
+        if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
             throw new Exception("Failure on Variable Test");
 
         if (result != @"

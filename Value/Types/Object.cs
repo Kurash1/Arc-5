@@ -25,22 +25,29 @@ public class ArcObject : Value
         if (Parser.HasEnclosingBrackets(code))
             code = Compiler.RemoveEnclosingBrackets(code);
 
-        Compiler comp = new Compiler();
-
-        string result = comp.compile(code);
-        Block newBlock = Parser.ParseString(result);
-        Block.Enumerator i = newBlock.GetEnumerator();
-        while (i.MoveNext())
+        if (code.First != null)
         {
-            i = comp.Var(i, (Block s) => Value.Parse(s), false);
-        }
+            Compiler comp = new Compiler();
 
-        foreach (KeyValuePair<string, Value> kvp in comp.variables)
-        {
-            Properties.Add(kvp.Key, kvp.Value);
+            string result = comp.compile(code);
+            
+            Block newBlock = Parser.ParseCode(result);
+            if (newBlock.First != null)
+            {
+                Walker i = new(newBlock);
+                do
+                {
+                    i = comp.Var(i, (Block s) => Value.Parse(s), false);
+                } while (i.MoveNext());
+            }
+
+            foreach (KeyValuePair<string, Value> kvp in comp.variables)
+            {
+                Properties.Add(kvp.Key, kvp.Value);
+            }
         }
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         throw new NotImplementedException();
     }
@@ -59,15 +66,17 @@ public class ArcObject : Value
         }
     }
 
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
         foreach(KeyValuePair<string, Value> kvp in ((ArcObject)v).Properties)
         {
+            if (kvp.Key == "global")
+                continue;
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
-            if(!Properties[kvp.Key].Equals(kvp.Value))
+            if(!Properties[kvp.Key].Fulfills(kvp.Value))
                 return false;
         }
         return true;
@@ -86,11 +95,11 @@ public class ArcObject : Value
     }
     public static bool operator ==(ArcObject obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcObject obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
     public static string ToString()
     {

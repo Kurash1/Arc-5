@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Arc;
 public partial class Compiler
 {
-    public static Block.Enumerator GetScope(Block.Enumerator i, out Block scope)
+    public static Walker GetScope(Walker i, out Block scope)
     {
         scope = new();    
         int indent = 0;
@@ -30,7 +30,7 @@ public partial class Compiler
         scope.RemoveLast();
         return scope;
     }
-    public static Block.Enumerator GetValue(Block.Enumerator i, out Block value)
+    public static Walker GetValue(Walker i, out Block value)
     {
         value = new();
         if (!Parser.open.IsMatch(i.Current))
@@ -44,19 +44,30 @@ public partial class Compiler
         }
         return i;
     }
-    public Block.Enumerator GetKeyValue(Block.Enumerator i, out string key, out Block value)
+    public Walker TryGetKeyValue(Walker i, out string key, out Block? value)
     {
         key = i.Current;
-
+        
         i.MoveNext();
 
         if (!Parser.equal.IsMatch(i.Current))
-            throw new Exception($@"Expecting an equal sign between Key and Value of a variable declaration was: {i.Current}");
+        {
+            i.MoveBack();
+            value = null;
+            return i;
+        }
 
         i.MoveNext();
 
         i = GetValue(i, out value);
 
+        return i;
+    }
+    public Walker GetKeyValue(Walker i, out string key, out Block value)
+    {
+        i = TryGetKeyValue(i, out key, out value);
+        if (value == null)
+            throw new Exception();
         return i;
     }
     public static string StringListSum(List<string> list)

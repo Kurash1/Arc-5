@@ -11,7 +11,7 @@ namespace Arc
 {
     public partial class Compiler
     {
-        public Dictionary<string, Value> variables = new()
+       public Dictionary<string, Value> variables = new()
         {
             { "global", global }
         };
@@ -32,22 +32,22 @@ namespace Arc
         {
             
             List<string> result = new();
-            Dictionary<string, Func<Block.Enumerator, Block.Enumerator>> keywords = new()
+            Dictionary<string, Func<Walker, Walker>> keywords = new()
             {
-                { "string", (Block.Enumerator i) => Var(i, (Block s) => new ArcString(s) ) },
-                { "bool", (Block.Enumerator i) => Var(i, (Block s) => new ArcBool(s) ) },
-                { "float", (Block.Enumerator i) => Var(i, (Block s) => new ArcFloat(s) ) },
-                { "int", (Block.Enumerator i) => Var(i, (Block s) => new ArcInt(s) ) },
-                { "var", (Block.Enumerator i) => Var(i, (Block s) => Value.Parse(s) ) },
-                { "object", (Block.Enumerator i) => Var(i, (Block s) => new ArcObject(s) ) },
-                { "interface", (Block.Enumerator i) => Var(i, (Block s) => new ArcInterface(s) ) },
-                { "list", (Block.Enumerator i) => Var(i, (Block s) => new ArcList(s) ) },
-                { "type", (Block.Enumerator i) => Var(i, (Block s) => new ArcType(s) ) },
-                { "inherit", (Block.Enumerator i) => Inherit(i) }
+                { "string", (Walker i) => Var(i, (Block s) => new ArcString(s) ) },
+                { "bool", (Walker i) => Var(i, (Block s) => new ArcBool(s) ) },
+                { "float", (Walker i) => Var(i, (Block s) => new ArcFloat(s) ) },
+                { "int", (Walker i) => Var(i, (Block s) => new ArcInt(s) ) },
+                { "var", (Walker i) => Var(i, (Block s) => Value.Parse(s) ) },
+                { "object", (Walker i) => Var(i, (Block s) => new ArcObject(s) ) },
+                { "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
+                { "list", (Walker i) => Var(i, (Block s) => new ArcList(s) ) },
+                { "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },
+                { "inherit", (Walker i) => Inherit(i) },
+                { "require", (Walker i) => Require(i) },
             };
 
-            Block.Enumerator g = code.GetEnumerator();
-            g.MoveNext();
+            Walker g = new(code);
             do
             {
                 if (keywords.ContainsKey(g.Current))

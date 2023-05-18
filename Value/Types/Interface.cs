@@ -33,18 +33,18 @@ public class ArcInterface : Value
             Properties.Add(kvp.Key, kvp.Value);
         }
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
-        Block.Enumerator g = comp.Var(i, (Block s) => new ArcObject(s));
         i.MoveNext();
         string baseKey = i.Current;
+        Walker g = comp.Var(i, (Block s) => new ArcObject(s), false);
         foreach(KeyValuePair<string, Value> kvp in Properties)
         {
             if(comp.TryGetVariable($"{baseKey}:{kvp.Key}", out Value value))
             {
                 if (kvp.Value.TypeCode == ValueTypeCode.Type)
                 {
-                    if (!kvp.Value.Equals(value))
+                    if (!kvp.Value.Fulfills(value))
                     {
                         throw new Exception();
                     }
@@ -77,7 +77,7 @@ public class ArcInterface : Value
             Properties[key] = value;
         }
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
@@ -85,7 +85,7 @@ public class ArcInterface : Value
         {
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
-            if (!Properties[kvp.Key].Equals(kvp.Value))
+            if (!Properties[kvp.Key].Fulfills(kvp.Value))
                 return false;
         }
         return true;
@@ -104,11 +104,11 @@ public class ArcInterface : Value
     }
     public static bool operator ==(ArcInterface obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcInterface obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
     public static string ToString()
     {

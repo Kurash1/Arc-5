@@ -28,7 +28,7 @@ public class ArcInt : ArcNumber
     {
         return new Block(Value.ToString());
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
@@ -36,18 +36,18 @@ public class ArcInt : ArcNumber
     }
     public static bool operator ==(ArcInt obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcInt obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
 
     public override string ToString()
     {
         return Value.ToString();
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         result.Add(ToString());
         return i;
