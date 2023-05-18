@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 namespace Arc;
 
 public static partial class Parser
 {
-    public static Block ParseString(string str)
+    public static Block ParseCode(string str)
     {
         var retval = new Block();
         if (string.IsNullOrWhiteSpace(str)) return retval;
@@ -34,5 +35,31 @@ public static partial class Parser
         }
         if (!string.IsNullOrWhiteSpace(s.Trim())) retval.AddLast(s.Trim());
         return retval;
+    }
+    public static string FormatCode(string str)
+    {
+        MatchCollection matches = formatter.Matches(str);
+
+        string[] vs = matches.Select(m => m.Value).ToArray();
+        int indent = 0;
+        for (int i = 0; i < vs.Length; i++)
+        {
+            if (vs[i].EndsWith('{'))
+            {
+                vs[i] = vs[i].Prepend(indent, '\t');
+                indent++;
+            }
+            else if (vs[i].EndsWith('}'))
+            {
+                indent--;
+                vs[i] = vs[i].Prepend(indent, '\t');
+            }
+            else
+            {
+                vs[i] = vs[i].Prepend(indent, '\t');
+            }
+        }
+
+        return string.Join(Environment.NewLine, vs);
     }
 }
