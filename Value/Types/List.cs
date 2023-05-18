@@ -61,7 +61,7 @@ public class ArcList : Value
     {
         throw new NotImplementedException();
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
@@ -72,17 +72,17 @@ public class ArcList : Value
         LinkedList<Value>.Enumerator b = vlist.GetEnumerator();
         while(a.MoveNext() && b.MoveNext())
         {
-            if(!a.Current.Equals(b.Current))
+            if(!a.Current.Fulfills(b.Current))
                 return false;
         }
         return true;
     }
     public static bool operator ==(ArcList obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcList obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
 }

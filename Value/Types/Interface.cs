@@ -44,7 +44,7 @@ public class ArcInterface : Value
             {
                 if (kvp.Value.TypeCode == ValueTypeCode.Type)
                 {
-                    if (!kvp.Value.Equals(value))
+                    if (!kvp.Value.Fulfills(value))
                     {
                         throw new Exception();
                     }
@@ -77,7 +77,7 @@ public class ArcInterface : Value
             Properties[key] = value;
         }
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
@@ -85,7 +85,7 @@ public class ArcInterface : Value
         {
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
-            if (!Properties[kvp.Key].Equals(kvp.Value))
+            if (!Properties[kvp.Key].Fulfills(kvp.Value))
                 return false;
         }
         return true;
@@ -104,11 +104,11 @@ public class ArcInterface : Value
     }
     public static bool operator ==(ArcInterface obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcInterface obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
     public static string ToString()
     {

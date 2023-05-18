@@ -34,7 +34,7 @@ public class ArcString : Value
     {
         return new Block(Value);
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if(v.TypeCode != TypeCode)
             return false;
@@ -42,11 +42,11 @@ public class ArcString : Value
     }
     public static bool operator ==(ArcString obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcString obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
 
     public bool StartsWith(string s) => Value.StartsWith(s);

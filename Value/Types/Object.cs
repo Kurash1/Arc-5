@@ -53,15 +53,17 @@ public class ArcObject : Value
         }
     }
 
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
         foreach(KeyValuePair<string, Value> kvp in ((ArcObject)v).Properties)
         {
+            if (kvp.Key == "global")
+                continue;
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
-            if(!Properties[kvp.Key].Equals(kvp.Value))
+            if(!Properties[kvp.Key].Fulfills(kvp.Value))
                 return false;
         }
         return true;
@@ -80,11 +82,11 @@ public class ArcObject : Value
     }
     public static bool operator ==(ArcObject obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcObject obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
     public static string ToString()
     {

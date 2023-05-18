@@ -26,7 +26,10 @@ public class ArcType : Value
         string vare = value.First.Value.ToString();
         char firstChar = char.ToUpper(vare[0]);
         vare = firstChar + vare.Substring(1);
-
+        if(!Enum.IsDefined(typeof(ValueTypeCode), vare))
+        {
+            throw new Exception();
+        }
         Type = (ValueTypeCode)Enum.Parse(typeof(ValueTypeCode), vare);
     }
     public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
@@ -45,7 +48,7 @@ public class ArcType : Value
         i = keywords[Type.ToString().ToLower()](i);
         return i;
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         return v.TypeCode == Type;
     }

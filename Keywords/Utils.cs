@@ -44,19 +44,29 @@ public partial class Compiler
         }
         return i;
     }
-    public Block.Enumerator GetKeyValue(Block.Enumerator i, out string key, out Block value)
+    public Block.Enumerator TryGetKeyValue(Block.Enumerator i, out string key, out Block? value)
     {
         key = i.Current;
-
+        
         i.MoveNext();
 
         if (!Parser.equal.IsMatch(i.Current))
-            throw new Exception($@"Expecting an equal sign between Key and Value of a variable declaration was: {i.Current}");
+        {
+            value = null;
+            return i;
+        }
 
         i.MoveNext();
 
         i = GetValue(i, out value);
 
+        return i;
+    }
+    public Block.Enumerator GetKeyValue(Block.Enumerator i, out string key, out Block value)
+    {
+        i = TryGetKeyValue(i, out key, out value);
+        if (value == null)
+            throw new Exception();
         return i;
     }
     public static string StringListSum(List<string> list)

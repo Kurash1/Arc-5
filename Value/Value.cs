@@ -28,6 +28,8 @@ public interface Value
         }
         else
         {
+            try { return new ArcType(s); }
+            catch (Exception) { }
             try { return new ArcBool(s); }
             catch (Exception) { }
             try { return new ArcInt(s); }
@@ -39,7 +41,7 @@ public interface Value
         }
         throw new Exception("Unrecognized variable type");
     }
-    public bool Equals(Value v);
+    public bool Fulfills(Value v);
     public string ToString();
     public Block ToBlock();
     public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp);

@@ -37,16 +37,16 @@ C
                 { "C", new ArcInt(3) }
             });
 
-        if (!((ArcObject)comp.variables["FirstLayer"]).Equals(expected))
+        if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
             throw new Exception("Failure on Inherit Test");
 
-        if (!((ArcInt)comp.variables["A"]).Equals(new ArcInt(1)))
+        if (!((ArcInt)comp.variables["A"]).Fulfills(new ArcInt(1)))
             throw new Exception("Failure on Inherit Test");
 
-        if (!((ArcInt)comp.variables["B"]).Equals(new ArcInt(2)))
+        if (!((ArcInt)comp.variables["B"]).Fulfills(new ArcInt(2)))
             throw new Exception("Failure on Inherit Test");
 
-        if (!((ArcInt)comp.variables["C"]).Equals(new ArcInt(3)))
+        if (!((ArcInt)comp.variables["C"]).Fulfills(new ArcInt(3)))
             throw new Exception("Failure on Inherit Test");
 
 

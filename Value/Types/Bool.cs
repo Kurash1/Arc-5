@@ -40,7 +40,7 @@ public class ArcBool : Value
     {
         return new Block(Value.ToString());
     }
-    public bool Equals(Value v)
+    public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
             return false;
@@ -48,11 +48,11 @@ public class ArcBool : Value
     }
     public static bool operator ==(ArcBool obj1, Value obj2)
     {
-        return obj1.Equals(obj2);
+        return obj1.Fulfills(obj2);
     }
     public static bool operator !=(ArcBool obj1, Value obj2)
     {
-        return !obj1.Equals(obj2);
+        return !obj1.Fulfills(obj2);
     }
     public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
     {

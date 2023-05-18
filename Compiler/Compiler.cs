@@ -43,7 +43,8 @@ namespace Arc
                 { "interface", (Block.Enumerator i) => Var(i, (Block s) => new ArcInterface(s) ) },
                 { "list", (Block.Enumerator i) => Var(i, (Block s) => new ArcList(s) ) },
                 { "type", (Block.Enumerator i) => Var(i, (Block s) => new ArcType(s) ) },
-                { "inherit", (Block.Enumerator i) => Inherit(i) }
+                { "inherit", (Block.Enumerator i) => Inherit(i) },
+                { "require", (Block.Enumerator i) => Require(i) },
             };
 
             Block.Enumerator g = code.GetEnumerator();
