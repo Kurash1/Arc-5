@@ -8,7 +8,7 @@ namespace Arc;
 
 public partial class Compiler
 {
-    public Block.Enumerator Require(Block.Enumerator i)
+    public Walker Require(Walker i)
     {
         i.MoveNext(); 
 

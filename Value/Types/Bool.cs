@@ -54,7 +54,7 @@ public class ArcBool : Value
     {
         return !obj1.Fulfills(obj2);
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         result.Add(ToString());
         return i;

@@ -44,7 +44,7 @@ public interface Value
     public bool Fulfills(Value v);
     public string ToString();
     public Block ToBlock();
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp);
+    public Walker Call(Walker i, ref List<string> result, Compiler comp);
     bool IsNumber() => (TypeCode == ValueTypeCode.Float || TypeCode == ValueTypeCode.Int);
 }
 
@@ -64,16 +64,16 @@ public interface Value
 //    // Constructor for ArcObject that takes in a list of strings representing the object
 //    public ArcObject(Block inputStrings)
 //    {
-//        //Dictionary<string, Func<Block.Enumerator, Block.Enumerator>> keywords /= /new //Dictionary<string, Func<Block.Enumerator, Block.Enumerator>>()
+//        //Dictionary<string, Func<Walker, Walker>> keywords /= /new //Dictionary<string, Func<Walker, Walker>>()
 //        //{
-//        //    { "object", (Block.Enumerator i) => Keywords.Var<ArcObject>(i, /Dict,/ //Parser.IsObject) },
-//        //    { "int", (Block.Enumerator i) => Keywords.Var<ArcInt>(i, Dict, //Parser.IsInt) },
-//        //    { "float", (Block.Enumerator i) => Keywords.Var<ArcFloat>(i, /Dict, ///Parser.IsFloat) },
-//        //    { "bool", (Block.Enumerator i) => Keywords.Var<ArcBool>(i, Dict, ////Parser.IsBool) },
-//        //    { "string", (Block.Enumerator i) => Keywords.Var<ArcString>(i, /Dict,/ //Parser.IsString) },
+//        //    { "object", (Walker i) => Keywords.Var<ArcObject>(i, /Dict,/ //Parser.IsObject) },
+//        //    { "int", (Walker i) => Keywords.Var<ArcInt>(i, Dict, //Parser.IsInt) },
+//        //    { "float", (Walker i) => Keywords.Var<ArcFloat>(i, /Dict, ///Parser.IsFloat) },
+//        //    { "bool", (Walker i) => Keywords.Var<ArcBool>(i, Dict, ////Parser.IsBool) },
+//        //    { "string", (Walker i) => Keywords.Var<ArcString>(i, /Dict,/ //Parser.IsString) },
 //        //};
 //        //
-//        //Block.Enumerator i = inputStrings.GetEnumerator();
+//        //Walker i = inputStrings.GetEnumerator();
 //        //i.MoveNext();
 //        //do
 //        //{

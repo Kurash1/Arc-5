@@ -27,14 +27,16 @@ public class ArcObject : Value
         code = Compiler.RemoveEnclosingBrackets(code);
 
         Compiler comp = new Compiler();
-
-        comp.compile(code);
-        foreach(KeyValuePair<string, Value> kvp in comp.variables)
+        if(code.First != null)
         {
-            Properties.Add(kvp.Key, kvp.Value);
+            comp.compile(code);
+            foreach(KeyValuePair<string, Value> kvp in comp.variables)
+            {
+                Properties.Add(kvp.Key, kvp.Value);
+            }
         }
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         throw new NotImplementedException();
     }

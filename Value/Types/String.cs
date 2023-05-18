@@ -21,7 +21,7 @@ public class ArcString : Value
         if (value.Count < 0) throw new Exception("Too few elements given to ArcString");
         Value = new ArcString(value.First.Value).Value;
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp) 
+    public Walker Call(Walker i, ref List<string> result, Compiler comp) 
     {
         result.Add(Value);
         return i;

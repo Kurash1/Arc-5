@@ -26,7 +26,7 @@ public class ArcList : Value
             throw new Exception("Object without enclosing brackets");
         code = Compiler.RemoveEnclosingBrackets(code);
 
-        Block.Enumerator i = code.GetEnumerator();
+        Walker i = new(code);
         i.MoveNext();
 
         do
@@ -57,7 +57,7 @@ public class ArcList : Value
         string s = sb.ToString();
         return s;
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         throw new NotImplementedException();
     }

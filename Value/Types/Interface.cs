@@ -33,9 +33,9 @@ public class ArcInterface : Value
             Properties.Add(kvp.Key, kvp.Value);
         }
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
-        Block.Enumerator g = comp.Var(i, (Block s) => new ArcObject(s));
+        Walker g = comp.Var(i, (Block s) => new ArcObject(s));
         i.MoveNext();
         string baseKey = i.Current;
         foreach(KeyValuePair<string, Value> kvp in Properties)

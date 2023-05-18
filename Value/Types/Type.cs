@@ -32,18 +32,18 @@ public class ArcType : Value
         }
         Type = (ValueTypeCode)Enum.Parse(typeof(ValueTypeCode), vare);
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
-        Dictionary<string, Func<Block.Enumerator, Block.Enumerator>> keywords = new()
+        Dictionary<string, Func<Walker, Walker>> keywords = new()
         {
-            { "string", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcString(s)) },
-            { "bool", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcBool(s)) },
-            { "float", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcFloat(s)) },
-            { "int", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcInt(s)) },
-            { "object", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcObject(s)) },
-            { "interface", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcInterface(s)) },
-            { "list", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcList(s)) },
-            { "type", (Block.Enumerator i) => comp.Var(i, (Block s) => new ArcType(s)) }
+            { "string", (Walker i) => comp.Var(i, (Block s) => new ArcString(s)) },
+            { "bool", (Walker i) => comp.Var(i, (Block s) => new ArcBool(s)) },
+            { "float", (Walker i) => comp.Var(i, (Block s) => new ArcFloat(s)) },
+            { "int", (Walker i) => comp.Var(i, (Block s) => new ArcInt(s)) },
+            { "object", (Walker i) => comp.Var(i, (Block s) => new ArcObject(s)) },
+            { "interface", (Walker i) => comp.Var(i, (Block s) => new ArcInterface(s)) },
+            { "list", (Walker i) => comp.Var(i, (Block s) => new ArcList(s)) },
+            { "type", (Walker i) => comp.Var(i, (Block s) => new ArcType(s)) }
         };
         i = keywords[Type.ToString().ToLower()](i);
         return i;

@@ -47,7 +47,7 @@ public class ArcInt : ArcNumber
     {
         return Value.ToString();
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         result.Add(ToString());
         return i;

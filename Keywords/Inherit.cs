@@ -8,7 +8,7 @@ namespace Arc;
 
 public partial class Compiler
 {
-    public Block.Enumerator Inherit(Block.Enumerator i)
+    public Walker Inherit(Walker i)
     {
         i.MoveNext(); //Previous is the inherit word
 

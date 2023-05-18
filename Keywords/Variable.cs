@@ -8,7 +8,7 @@ namespace Arc;
 
 public partial class Compiler
 {
-    public Block.Enumerator Var<T>(Block.Enumerator i, Func<Block,T> Constructor) where T : Value
+    public Walker Var<T>(Walker i, Func<Block,T> Constructor) where T : Value
     {
         i.MoveNext(); //The previous spot is the datatype
 
