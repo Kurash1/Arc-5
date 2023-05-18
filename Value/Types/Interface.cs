@@ -35,9 +35,9 @@ public class ArcInterface : Value
     }
     public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
-        Walker g = comp.Var(i, (Block s) => new ArcObject(s));
         i.MoveNext();
         string baseKey = i.Current;
+        Walker g = comp.Var(i, (Block s) => new ArcObject(s), false);
         foreach(KeyValuePair<string, Value> kvp in Properties)
         {
             if(comp.TryGetVariable($"{baseKey}:{kvp.Key}", out Value value))

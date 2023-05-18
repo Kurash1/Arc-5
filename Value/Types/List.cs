@@ -26,7 +26,6 @@ public class ArcList : Value
             code = Compiler.RemoveEnclosingBrackets(code);
 
         Walker i = new(code);
-        i.MoveNext();
 
         do
         {

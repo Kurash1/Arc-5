@@ -25,22 +25,29 @@ public class ArcObject : Value
         if (Parser.HasEnclosingBrackets(code))
             code = Compiler.RemoveEnclosingBrackets(code);
 
-        Compiler comp = new Compiler();
-
-        string result = comp.compile(code);
-        Block newBlock = Parser.ParseString(result);
-        Block.Enumerator i = newBlock.GetEnumerator();
-        while (i.MoveNext())
+        if (code.First != null)
         {
-            i = comp.Var(i, (Block s) => Value.Parse(s), false);
-        }
+            Compiler comp = new Compiler();
 
-        foreach (KeyValuePair<string, Value> kvp in comp.variables)
-        {
-            Properties.Add(kvp.Key, kvp.Value);
+            string result = comp.compile(code);
+            
+            Block newBlock = Parser.ParseCode(result);
+            if (newBlock.First != null)
+            {
+                Walker i = new(newBlock);
+                do
+                {
+                    i = comp.Var(i, (Block s) => Value.Parse(s), false);
+                } while (i.MoveNext());
+            }
+
+            foreach (KeyValuePair<string, Value> kvp in comp.variables)
+            {
+                Properties.Add(kvp.Key, kvp.Value);
+            }
         }
     }
-    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
+    public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
         throw new NotImplementedException();
     }

@@ -11,7 +11,7 @@ namespace Arc
 {
     public partial class Compiler
     {
-        public Dictionary<string, Value> variables = new()
+       public Dictionary<string, Value> variables = new()
         {
             { "global", global }
         };
@@ -48,7 +48,6 @@ namespace Arc
             };
 
             Walker g = new(code);
-            g.MoveNext();
             do
             {
                 if (keywords.ContainsKey(g.Current))

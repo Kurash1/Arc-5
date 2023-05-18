@@ -29,7 +29,7 @@ public class Walker
     {
         if (code.First == null)
             throw new Exception();
-        this.node = code.First;
+        node = code.First;
     }
     public bool MoveNext()
     {
