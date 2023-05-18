@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace Arc;
-
-public static partial class Utisl
+public static partial class Utils
 {
     public static char ToUpper(this char left)
     {

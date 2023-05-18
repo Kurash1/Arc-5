@@ -44,7 +44,7 @@ public class ArcList : Value
             sb.Append($"{a.ToBlock()}");
         }
         sb.Append(" }");
-        return Parser.ParseString(sb.ToString());
+        return Parser.ParseCode(sb.ToString());
     }
     public override string ToString()
     {

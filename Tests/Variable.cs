@@ -27,14 +27,14 @@ object FirstLayer = {{
         }}
     }}
 }}
-FirstLayer:SecondLayer:hello
 string HelloGet = FirstLayer:hello
-HelloGet
 string NumAsString = 121
 int NumFromString = NumAsString
 object global:GlobalObject = {{
 
 }}
+
+FirstLayer:SecondLayer:hello = HelloGet
         ").Trim();
 
         ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
@@ -57,7 +57,8 @@ object global:GlobalObject = {{
         if (!((ArcObject)comp.variables["FirstLayer"]).Equals(expected))
             throw new Exception("Failure on Variable Test");
 
-        if (result != "\"Wrld\" \"World\"")
+        if (result != @"
+""Wrld"" = ""World""".Trim())
             throw new Exception("Failure on Variable Test");
 
         Console.WriteLine("Success on Variable Test");

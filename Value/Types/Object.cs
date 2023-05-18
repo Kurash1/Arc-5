@@ -76,7 +76,7 @@ public class ArcObject : Value
                 sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToBlock()}");
         }
         sb.Append(" }");
-        return Parser.ParseString(sb.ToString());
+        return Parser.ParseCode(sb.ToString());
     }
     public static bool operator ==(ArcObject obj1, Value obj2)
     {
