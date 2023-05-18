@@ -22,14 +22,20 @@ public class ArcObject : Value
     {
         Properties = new Dictionary<string, Value>();
 
-        if (!Parser.HasEnclosingBrackets(code))
-            throw new Exception("Object without enclosing brackets");
-        code = Compiler.RemoveEnclosingBrackets(code);
+        if (Parser.HasEnclosingBrackets(code))
+            code = Compiler.RemoveEnclosingBrackets(code);
 
         Compiler comp = new Compiler();
 
-        comp.compile(code);
-        foreach(KeyValuePair<string, Value> kvp in comp.variables)
+        string result = comp.compile(code);
+        Block newBlock = Parser.ParseString(result);
+        Block.Enumerator i = newBlock.GetEnumerator();
+        while (i.MoveNext())
+        {
+            i = comp.Var(i, (Block s) => Value.Parse(s), false);
+        }
+
+        foreach (KeyValuePair<string, Value> kvp in comp.variables)
         {
             Properties.Add(kvp.Key, kvp.Value);
         }

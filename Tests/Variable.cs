@@ -25,6 +25,9 @@ object FirstLayer = {{
         list test = {{
             100 200 300
         }}
+        test2 = {{
+            100 200 300
+        }}
     }}
 }}
 FirstLayer:SecondLayer:hello
@@ -46,11 +49,19 @@ object global:GlobalObject = {{
                 { "SecondLayer", new ArcObject(new Dictionary<string, Value>(){
                     { "hello", new ArcString("\"Wrld\"") },
                     { "test", new ArcList(new LinkedList<Value>(new[]
-                    {
-                        new ArcInt(100),
-                        new ArcInt(200),
-                        new ArcInt(300)
-                    }))}
+                        {
+                            new ArcInt(100),
+                            new ArcInt(200),
+                            new ArcInt(300)
+                        }
+                    ))},
+                    { "test2", new ArcList(new LinkedList<Value>(new[]
+                        {
+                            new ArcInt(100),
+                            new ArcInt(200),
+                            new ArcInt(300)
+                        }
+                    ))}
                 }) }
             });
 
