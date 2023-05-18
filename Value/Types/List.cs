@@ -22,9 +22,8 @@ public class ArcList : Value
     {
         List = new();
 
-        if (!Parser.HasEnclosingBrackets(code))
-            throw new Exception("Object without enclosing brackets");
-        code = Compiler.RemoveEnclosingBrackets(code);
+        if (Parser.HasEnclosingBrackets(code))
+            code = Compiler.RemoveEnclosingBrackets(code);
 
         Walker i = new(code);
         i.MoveNext();
@@ -44,7 +43,7 @@ public class ArcList : Value
             sb.Append($"{a.ToBlock()}");
         }
         sb.Append(" }");
-        return Parser.ParseString(sb.ToString());
+        return Parser.ParseCode(sb.ToString());
     }
     public override string ToString()
     {

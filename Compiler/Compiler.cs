@@ -27,7 +27,7 @@ namespace Arc
         {
 
         }
-        public string compile(string file) => compile(Parser.ParseString(file));
+        public string compile(string file) => compile(Parser.ParseCode(file));
         public string compile(Block code)
         {
             
@@ -73,7 +73,7 @@ namespace Arc
             {
                 res.Append($"{s.Trim()} ");
             }
-            return res.ToString();
+            return Parser.FormatCode(res.ToString());
         }
     }
 }

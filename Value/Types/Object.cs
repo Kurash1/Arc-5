@@ -22,21 +22,25 @@ public class ArcObject : Value
     {
         Properties = new Dictionary<string, Value>();
 
-        if (!Parser.HasEnclosingBrackets(code))
-            throw new Exception("Object without enclosing brackets");
-        code = Compiler.RemoveEnclosingBrackets(code);
+        if (Parser.HasEnclosingBrackets(code))
+            code = Compiler.RemoveEnclosingBrackets(code);
 
         Compiler comp = new Compiler();
-        if(code.First != null)
+
+        string result = comp.compile(code);
+        Block newBlock = Parser.ParseString(result);
+        Block.Enumerator i = newBlock.GetEnumerator();
+        while (i.MoveNext())
         {
-            comp.compile(code);
-            foreach(KeyValuePair<string, Value> kvp in comp.variables)
-            {
-                Properties.Add(kvp.Key, kvp.Value);
-            }
+            i = comp.Var(i, (Block s) => Value.Parse(s), false);
+        }
+
+        foreach (KeyValuePair<string, Value> kvp in comp.variables)
+        {
+            Properties.Add(kvp.Key, kvp.Value);
         }
     }
-    public Walker Call(Walker i, ref List<string> result, Compiler comp)
+    public Block.Enumerator Call(Block.Enumerator i, ref List<string> result, Compiler comp)
     {
         throw new NotImplementedException();
     }
@@ -80,7 +84,7 @@ public class ArcObject : Value
                 sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToBlock()}");
         }
         sb.Append(" }");
-        return Parser.ParseString(sb.ToString());
+        return Parser.ParseCode(sb.ToString());
     }
     public static bool operator ==(ArcObject obj1, Value obj2)
     {

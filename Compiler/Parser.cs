@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Arc;
 public static partial class Parser
 {
+    public static Regex formatter = new Regex("}|\\S+ +\\S+ +\\S+", RegexOptions.Compiled);
     public static Regex open = new Regex("^{$", RegexOptions.Compiled);
     public static Regex close = new Regex("^}$", RegexOptions.Compiled);
     public static Regex equal = new Regex("^=$", RegexOptions.Compiled);

@@ -25,16 +25,19 @@ object FirstLayer = {{
         list test = {{
             100 200 300
         }}
+        test2 = {{
+            100 200 300
+        }}
     }}
 }}
-FirstLayer:SecondLayer:hello
 string HelloGet = FirstLayer:hello
-HelloGet
 string NumAsString = 121
 int NumFromString = NumAsString
 object global:GlobalObject = {{
 
 }}
+
+FirstLayer:SecondLayer:hello = HelloGet
         ").Trim();
 
         ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
@@ -47,18 +50,27 @@ object global:GlobalObject = {{
                 { "SecondLayer", new ArcObject(new Dictionary<string, Value>(){
                     { "hello", new ArcString("\"Wrld\"") },
                     { "test", new ArcList(new LinkedList<Value>(new[]
-                    {
-                        new ArcInt(100),
-                        new ArcInt(200),
-                        new ArcInt(300)
-                    }))}
+                        {
+                            new ArcInt(100),
+                            new ArcInt(200),
+                            new ArcInt(300)
+                        }
+                    ))},
+                    { "test2", new ArcList(new LinkedList<Value>(new[]
+                        {
+                            new ArcInt(100),
+                            new ArcInt(200),
+                            new ArcInt(300)
+                        }
+                    ))}
                 }) }
             });
 
         if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
             throw new Exception("Failure on Variable Test");
 
-        if (result != "\"Wrld\" \"World\"")
+        if (result != @"
+""Wrld"" = ""World""".Trim())
             throw new Exception("Failure on Variable Test");
 
         Console.WriteLine("Success on Variable Test");

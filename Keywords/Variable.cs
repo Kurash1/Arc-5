@@ -10,7 +10,8 @@ public partial class Compiler
 {
     public Walker Var<T>(Walker i, Func<Block,T> Constructor) where T : Value
     {
-        i.MoveNext(); //The previous spot is the datatype
+        if(move)
+            i.MoveNext(); //The previous spot is the datatype
 
         i = GetKeyValue(i, out string key, out Block value);
 

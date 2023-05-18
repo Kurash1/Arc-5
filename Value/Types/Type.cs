@@ -54,7 +54,7 @@ public class ArcType : Value
     }
     public Block ToBlock()
     {
-        return Parser.ParseString(Type.ToString());
+        return Parser.ParseCode(Type.ToString());
     }
     public override string ToString()
     {
