@@ -24,6 +24,20 @@ public partial class Compiler
         } while (indent > 0);
         return i;
     }
+    public static bool TryTrimOne(string value, char s, out string newValue)
+    {
+        newValue = null;
+        if(value == null)
+            return false;
+        if (value.Length < 2)
+            return false;
+        if (value[0] != s)
+            return false;
+        if (value[value.Length - 1] != s)
+            return false;
+        newValue = value.Substring(1, value.Length - 2);
+        return true;
+    }
     public static Block RemoveEnclosingBrackets(Block scope)
     {
         scope.RemoveFirst();
