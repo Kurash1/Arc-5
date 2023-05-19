@@ -63,6 +63,11 @@ namespace Arc
                     }
                     continue;
                 }
+                else if(TryTrimOne(g.Current, '`', out string newValue))
+                {
+                    result.Add(newValue);
+                    continue;
+                }
 
                 result.Add(g.Current);
             } while (g.MoveNext());
