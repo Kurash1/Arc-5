@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 using Pastel;
 namespace Arc;
 
-public class ArcList : Value
+public class ArcList : ArcEnumerable
 {
     public ValueTypeCode TypeCode => ValueTypeCode.List;
     public LinkedList<Value> List { get; set; }
@@ -75,12 +76,8 @@ public class ArcList : Value
         }
         return true;
     }
-    public static bool operator ==(ArcList obj1, Value obj2)
+    public IEnumerator GetEnumerator()
     {
-        return obj1.Fulfills(obj2);
-    }
-    public static bool operator !=(ArcList obj1, Value obj2)
-    {
-        return !obj1.Fulfills(obj2);
+        return List.GetEnumerator();
     }
 }

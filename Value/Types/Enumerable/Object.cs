@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 using Pastel;
 namespace Arc;
 
-public class ArcObject : Value
+public class ArcObject : ArcEnumerable
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Object;
     public Dictionary<string, Value> Properties;
@@ -65,7 +66,6 @@ public class ArcObject : Value
             Properties[key] = value;
         }
     }
-
     public bool Fulfills(Value v)
     {
         if (v.TypeCode != TypeCode)
@@ -93,16 +93,10 @@ public class ArcObject : Value
         sb.Append(" }");
         return Parser.ParseCode(sb.ToString());
     }
-    public static bool operator ==(ArcObject obj1, Value obj2)
+    public new static string ToString() => "[Arc Object]";
+
+    public IEnumerator GetEnumerator()
     {
-        return obj1.Fulfills(obj2);
-    }
-    public static bool operator !=(ArcObject obj1, Value obj2)
-    {
-        return !obj1.Fulfills(obj2);
-    }
-    public static string ToString()
-    {
-        return "[Arc Object]";
+        return Properties.GetEnumerator();
     }
 }

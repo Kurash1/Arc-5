@@ -12,7 +12,7 @@ public static partial class Parser
     public static Regex close = new Regex("^}$", RegexOptions.Compiled);
     public static Regex equal = new Regex("^=$", RegexOptions.Compiled);
     public static Regex inQuotes = new Regex("^\"(.*)\"$", RegexOptions.Compiled);
-    public static Regex validVariableKey = new Regex("^[:$a-zA-Z0-9_]+$", RegexOptions.Compiled);
+    private static Regex validVariableKey = new Regex("^[:$a-zA-Z0-9_]+$", RegexOptions.Compiled);
     public static bool isVariableKey(string s)
     {
         return validVariableKey.IsMatch(s);
