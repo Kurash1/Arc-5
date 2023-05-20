@@ -44,6 +44,8 @@ public partial class Compiler
         {
             foreach (KeyValuePair<string, Value> kvp in (ArcObject)enumerableObject)
             {
+                if (kvp.Key == "global")
+                    continue;
                 variable.dict[variable.key] = new ArcObject(new Dictionary<string, Value>()
                 {
                     { "key", new ArcString(kvp.Key) },

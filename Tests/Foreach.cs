@@ -11,17 +11,32 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile($@"
-list args = {{
+        string result = comp.compile(@"
+list args = {
     kazakh
     khalkha
     korchin
-}}
-OR = {{
-    foreach $culture in args = {{
+}
+OR = {
+    foreach $culture in args = {
         `primary_culture` = $culture
-    }}
-}}
+    }
+}
+
+object obj = {
+    int a = 10
+    int b = 20
+    int c = 30
+}
+list lst = {
+    10 20 30
+}
+foreach kvp in obj = {
+    kvp:value = yes
+}
+foreach value in lst = {
+    value = yes
+}
         ").Trim();
 
         string expected = @"
@@ -30,6 +45,12 @@ OR = {
 	primary_culture = khalkha
 	primary_culture = korchin
 }
+10 = yes
+20 = yes
+30 = yes
+10 = yes
+20 = yes
+30 = yes
 ".Trim();
         if (result != expected)
             throw new Exception();
