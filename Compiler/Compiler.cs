@@ -45,6 +45,7 @@ namespace Arc
                 { "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },
                 { "inherit", (Walker i) => Inherit(i) },
                 { "require", (Walker i) => Require(i) },
+                { "foreach", (Walker i) => Foreach(i, ref result) },
             };
 
             Walker g = new(code);
