@@ -31,6 +31,7 @@ type d = string
 type e = object
 type f = list
 type g = type
+type h = block
 a a2 = yes
 b b2 = 10
 c c2 = 10.1
@@ -41,7 +42,12 @@ e e2 = {{
 f f2 = {{
     test test test
 }}
+
 g g2 = bool
+
+h h2 = {{
+    test test test
+}}
         ").Trim();
 
         Console.WriteLine("Success on Type And Interface Test");

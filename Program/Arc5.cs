@@ -28,6 +28,7 @@ namespace ArcInstance
             ArcTests.Tests.RequireTest();
             ArcTests.Tests.UncompiledTest();
             ArcTests.Tests.ForeachTest();
+            ArcTests.Tests.BlockTest();
 #if !DEBUG
             }
             catch(Exception e) { Console.WriteLine(e.Message); };

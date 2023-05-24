@@ -10,7 +10,7 @@ public static partial class Parser
 {
     public static Block ParseCode(string str)
     {
-        var retval = new Block();
+        Block retval = new Block();
         if (string.IsNullOrWhiteSpace(str)) return retval;
         int ndx = 0;
         string s = "";
