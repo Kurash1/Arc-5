@@ -16,17 +16,13 @@ namespace Arc
             { "global", global }
         };
         public static ArcObject global = new ArcObject();
+
+#pragma warning disable CS8618 // Fields are assigned by Arc5.cs
         public static string directory;
         public static Instance owner;
-        public Compiler(string directory, Instance owner)
-        {
-            Compiler.directory = directory;
-            Compiler.owner = owner;
-        }
-        public Compiler()
-        {
+#pragma warning restore CS8618
 
-        }
+        public Compiler() { }
         public string compile(string file, bool preprocessor = false)
         {
             if (preprocessor)
@@ -84,7 +80,11 @@ namespace Arc
             {
                 res.Append($"{s.Trim()} ");
             }
-            return Parser.FormatCode(res.ToString());
+
+            if (Defines.Formatting)
+                return Parser.FormatCode(res.ToString());
+            else
+                return res.ToString();
         }
     }
 }

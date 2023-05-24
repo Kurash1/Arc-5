@@ -69,8 +69,9 @@ FirstLayer:SecondLayer:hello = HelloGet
         if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
             throw new Exception("Failure on Variable Test");
 
-        if (result != @"
-""Wrld"" = ""World""".Trim())
+        if (!ResultMatches(result, @"
+""Wrld"" = ""World""
+"))
             throw new Exception("Failure on Variable Test");
 
         Console.WriteLine("Success on Variable Test");

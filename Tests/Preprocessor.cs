@@ -12,17 +12,17 @@ public static partial class Tests
         Compiler comp = new();
 
         string result = comp.compile($@"
-/replace p@ globals:provinces:
-/replace :: globals:
+/replace p@ with globals:provinces:
+/replace :: with globals:
 
 p@ = 1
 :: = 1
         ", true).Trim();
 
-        if (result != @"
+        if (!ResultMatches(result, @"
 globals:provinces: = 1
 globals: = 1
-".Trim())
+"))
             throw new Exception("Failure on Preprocessor Test");
 
 

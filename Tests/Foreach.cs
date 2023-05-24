@@ -39,7 +39,7 @@ foreach value in lst = {
 }
         ").Trim();
 
-        string expected = @"
+        if (!ResultMatches(result, @"
 OR = {
 	primary_culture = kazakh
 	primary_culture = khalkha
@@ -51,8 +51,7 @@ OR = {
 10 = yes
 20 = yes
 30 = yes
-".Trim();
-        if (result != expected)
+"))
             throw new Exception();
 
         Console.WriteLine("Success on Foreach Test");

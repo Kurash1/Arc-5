@@ -12,7 +12,7 @@ public static partial class Parser
     {
         List<(string OldValue, string NewValue)> replaces = new();
 
-        Regex Replace = new Regex("/replace (\\S+) (\\S+)", RegexOptions.Compiled);
+        Regex Replace = new Regex("/replace (\\S+) with (\\S+)", RegexOptions.Compiled);
         input = Replace.Replace(input, delegate (Match m) {
             replaces.Add((m.Groups[1].Value, m.Groups[2].Value));
             return "";
