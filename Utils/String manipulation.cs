@@ -12,4 +12,9 @@ public static partial class Utils
         string s = "".PadLeft(amount, c);
         return s + sa;
     }
+    public static string RegRep(this string sa, string regex, string replace)
+    {
+        return Regex.Replace(sa, regex, replace);
+    }
+
 }

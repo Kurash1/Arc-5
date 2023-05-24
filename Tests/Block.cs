@@ -20,9 +20,9 @@ block primary_culture = {
 primary_culture = finnish
         ").Trim();
 
-        if (result != @"
+        if (!ResultMatches(result,@"
 primary_culture = finnish
-".Trim())
+"))
             throw new Exception("Failure on Block Test");
 
         Console.WriteLine("Success on Variable Test");

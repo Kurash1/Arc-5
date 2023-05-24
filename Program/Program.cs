@@ -6,7 +6,7 @@ try
 {
 #endif
 
-arc.test();
+arc.Run();
 
 #if !DEBUG
 }

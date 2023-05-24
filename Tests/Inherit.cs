@@ -51,7 +51,7 @@ C
 
 
 
-        if (result != "1 2 3")
+        if (!ResultMatches(result, @"1 2 3"))
             throw new Exception("Failure on Inherit Test");
 
         Console.WriteLine("Success on Inherit Test");
