@@ -8,6 +8,23 @@ namespace Arc;
 
 public static partial class Parser
 {
+    public static string Preprocessor(string input)
+    {
+        List<(string OldValue, string NewValue)> replaces = new();
+
+        Regex Replace = new Regex("/replace (\\S+) (\\S+)", RegexOptions.Compiled);
+        input = Replace.Replace(input, delegate (Match m) {
+            replaces.Add((m.Groups[1].Value, m.Groups[2].Value));
+            return "";
+        });
+
+        foreach (var replace in replaces)
+        {
+            input = input.Replace(replace.OldValue, replace.NewValue);
+        }
+
+        return input;
+    }
     public static Block ParseCode(string str)
     {
         Block retval = new Block();

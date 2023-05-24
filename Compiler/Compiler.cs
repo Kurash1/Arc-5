@@ -27,7 +27,12 @@ namespace Arc
         {
 
         }
-        public string compile(string file) => compile(Parser.ParseCode(file));
+        public string compile(string file, bool preprocessor = false)
+        {
+            if (preprocessor)
+                file = Parser.Preprocessor(file);
+            return compile(Parser.ParseCode(file));
+        }
         public string compile(Block code)
         {
             
