@@ -12,11 +12,11 @@ public static partial class Tests
         Compiler comp = new();
 
         string result = comp.compile($@"
-list add_treasury = {{
+block add_treasury = {{
     require args = int
     `add_treasury` = args
 }}
-`add_treasury` = args
+`add_treasury` = a
         ").Trim();
 
         Console.WriteLine("Success on Uncompiled Text Test");

@@ -12,7 +12,8 @@ public enum ValueTypeCode
     Object,
     List,
     Interface,
-    Type
+    Type,
+    Block
 }
 public interface Value
 {

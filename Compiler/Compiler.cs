@@ -40,6 +40,7 @@ namespace Arc
                 { "int", (Walker i) => Var(i, (Block s) => new ArcInt(s) ) },
                 { "var", (Walker i) => Var(i, (Block s) => Value.Parse(s) ) },
                 { "object", (Walker i) => Var(i, (Block s) => new ArcObject(s) ) },
+                { "block", (Walker i) => Var(i, (Block s) => new ArcBlock(s) ) },
                 { "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
                 { "list", (Walker i) => Var(i, (Block s) => new ArcList(s) ) },
                 { "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },

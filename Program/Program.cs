@@ -14,6 +14,6 @@ catch (Exception e)
 {
     Console.WriteLine(e);
 }
-#endif
 Console.WriteLine("Press any key to exit");
 Console.ReadKey();
+#endif

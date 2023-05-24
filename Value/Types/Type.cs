@@ -41,6 +41,7 @@ public class ArcType : Value
             { "float", (Walker i) => comp.Var(i, (Block s) => new ArcFloat(s)) },
             { "int", (Walker i) => comp.Var(i, (Block s) => new ArcInt(s)) },
             { "object", (Walker i) => comp.Var(i, (Block s) => new ArcObject(s)) },
+            { "block", (Walker i) => comp.Var(i, (Block s) => new ArcBlock(s)) },
             { "interface", (Walker i) => comp.Var(i, (Block s) => new ArcInterface(s)) },
             { "list", (Walker i) => comp.Var(i, (Block s) => new ArcList(s)) },
             { "type", (Walker i) => comp.Var(i, (Block s) => new ArcType(s)) }
