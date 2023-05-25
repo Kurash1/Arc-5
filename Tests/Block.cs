@@ -13,7 +13,7 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile(@"
+        string result = comp.Compile(@"
 block primary_culture = {
     `primary_culture` = args
 }

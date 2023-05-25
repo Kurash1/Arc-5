@@ -13,50 +13,50 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile($@"
-object FirstLayer = {{
+        string result = comp.Compile(@"
+object FirstLayer = {
     string hello = ""World""
     bool true = yes
     bool false = no
     float pi = 3.14
     int i = 0
-    object SecondLayer = {{
+    object SecondLayer = {
         string hello = ""Wrld""
-        list test = {{
+        list test = [
             100 200 300
-        }}
-        test2 = {{
+        ]
+        test2 = [
             100 200 300
-        }}
-    }}
-}}
+        ]
+    }
+}
 string HelloGet = FirstLayer:hello
 string NumAsString = 121
 int NumFromString = NumAsString
-object global:GlobalObject = {{
+object global:GlobalObject = {
 
-}}
+}
 
 FirstLayer:SecondLayer:hello = HelloGet
         ").Trim();
 
-        ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
+        ArcObject expected = new(new Dictionary<string, IValue>(){
                 { "global", Compiler.global },
                 { "hello", new ArcString("\"World\"") },
                 { "true", new ArcBool(true) },
                 { "false", new ArcBool(false) },
                 { "pi", new ArcFloat(3.14) },
                 { "i", new ArcInt(0) },
-                { "SecondLayer", new ArcObject(new Dictionary<string, Value>(){
+                { "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
                     { "hello", new ArcString("\"Wrld\"") },
-                    { "test", new ArcList(new LinkedList<Value>(new[]
+                    { "test", new ArcList(new LinkedList<IValue>(new[]
                         {
                             new ArcInt(100),
                             new ArcInt(200),
                             new ArcInt(300)
                         }
                     ))},
-                    { "test2", new ArcList(new LinkedList<Value>(new[]
+                    { "test2", new ArcList(new LinkedList<IValue>(new[]
                         {
                             new ArcInt(100),
                             new ArcInt(200),

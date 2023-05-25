@@ -11,7 +11,7 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile($@"
+        string result = comp.Compile($@"
 object FirstLayer = {{
     object SecondLayer = {{
         int A = 1
@@ -26,8 +26,8 @@ B
 C
         ").Trim();
 
-        ArcObject expected = new ArcObject(new Dictionary<string, Value>(){
-                { "SecondLayer", new ArcObject(new Dictionary<string, Value>(){
+        ArcObject expected = new(new Dictionary<string, IValue>(){
+                { "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
                     { "A", new ArcInt(1) },
                     { "B", new ArcInt(2) },
                     { "C", new ArcInt(3) },

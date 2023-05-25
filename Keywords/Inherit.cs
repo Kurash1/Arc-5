@@ -17,12 +17,15 @@ public partial class Compiler
 
         i.MoveNext();
 
-        if (TryGetVariable(i.Current, out var variable))
+        if (TryGetVariable(i.Current, out IValue? variable))
         {
+            if(variable == null)
+                throw new Exception();
+
             if(variable.TypeCode == ValueTypeCode.Object)
             {
                 ArcObject var = (ArcObject)variable;
-                foreach (KeyValuePair<string, Value> kvp in var.Properties)
+                foreach (KeyValuePair<string, IValue> kvp in var.Properties)
                 {
                     if(kvp.Key != "global")
                         variables.Add(kvp.Key, kvp.Value);

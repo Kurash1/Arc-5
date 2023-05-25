@@ -5,30 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Arc;
-public class ArcInterface : Value
+public class ArcInterface : IValue
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Object;
-    public Dictionary<string, Value> Properties;
+    public Dictionary<string, IValue> Properties;
     public ArcInterface()
     {
-        Properties = new Dictionary<string, Value>();
+        Properties = new Dictionary<string, IValue>();
     }
-    public ArcInterface(Dictionary<string, Value> value)
+    public ArcInterface(Dictionary<string, IValue> value)
     {
         Properties = value;
     }
     public ArcInterface(Block code)
     {
-        Properties = new Dictionary<string, Value>();
+        Properties = new Dictionary<string, IValue>();
 
         if (!Parser.HasEnclosingBrackets(code))
             throw new Exception("Object without enclosing brackets");
         code = Compiler.RemoveEnclosingBrackets(code);
 
-        Compiler comp = new Compiler();
+        Compiler comp = new();
 
-        comp.compile(code);
-        foreach (KeyValuePair<string, Value> kvp in comp.variables)
+        comp.Compile(code);
+        foreach (KeyValuePair<string, IValue> kvp in comp.variables)
         {
             Properties.Add(kvp.Key, kvp.Value);
         }
@@ -38,10 +38,13 @@ public class ArcInterface : Value
         i.MoveNext();
         string baseKey = i.Current;
         Walker g = comp.Var(i, (Block s) => new ArcObject(s), false);
-        foreach(KeyValuePair<string, Value> kvp in Properties)
+        foreach(KeyValuePair<string, IValue> kvp in Properties)
         {
-            if(comp.TryGetVariable($"{baseKey}:{kvp.Key}", out Value value))
+            if(comp.TryGetVariable($"{baseKey}:{kvp.Key}", out IValue? value))
             {
+                if (value == null)
+                    throw new Exception();
+
                 if (kvp.Value.TypeCode == ValueTypeCode.Type)
                 {
                     if (!kvp.Value.Fulfills(value))
@@ -54,8 +57,8 @@ public class ArcInterface : Value
             {
                 if(kvp.Value.TypeCode != ValueTypeCode.Type)
                 {
-                    var a = comp.GetNewVariable($"{baseKey}:{kvp.Key}");
-                    a.dict[a.key] = kvp.Value;
+                    (Dictionary<string, IValue> dict, string key) = comp.GetNewVariable($"{baseKey}:{kvp.Key}");
+                    dict[key] = kvp.Value;
                 }
                 else
                     throw new Exception();
@@ -63,7 +66,7 @@ public class ArcInterface : Value
         }
         return g;
     }
-    public Value this[string key]
+    public IValue this[string key]
     {
         get
         {
@@ -77,11 +80,11 @@ public class ArcInterface : Value
             Properties[key] = value;
         }
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         if (v.TypeCode != TypeCode)
             return false;
-        foreach (KeyValuePair<string, Value> kvp in ((ArcInterface)v).Properties)
+        foreach (KeyValuePair<string, IValue> kvp in ((ArcInterface)v).Properties)
         {
             if (!Properties.ContainsKey(kvp.Key))
                 return false;
@@ -92,9 +95,9 @@ public class ArcInterface : Value
     }
     public Block ToBlock()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append("{ ");
-        foreach (KeyValuePair<string, Value> kvp in Properties)
+        foreach (KeyValuePair<string, IValue> kvp in Properties)
         {
             if (kvp.Key != "global")
                 sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToBlock()}");
@@ -102,15 +105,7 @@ public class ArcInterface : Value
         sb.Append(" }");
         return Parser.ParseCode(sb.ToString());
     }
-    public static bool operator ==(ArcInterface obj1, Value obj2)
-    {
-        return obj1.Fulfills(obj2);
-    }
-    public static bool operator !=(ArcInterface obj1, Value obj2)
-    {
-        return !obj1.Fulfills(obj2);
-    }
-    public static string ToString()
+    public override string ToString()
     {
         return "[Arc Interface]";
     }

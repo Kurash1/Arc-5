@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Arc;
 
-public class ArcBool : Value
+public class ArcBool : IValue
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Bool;
     public bool Value { get; set; }
@@ -23,8 +23,12 @@ public class ArcBool : Value
     }
     public ArcBool(Block value)
     {
-        if (value.Count > 1) throw new Exception("Too many elements given to ArcString");
-        if (value.Count < 0) throw new Exception("Too few elements given to ArcString");
+        if (value.Count > 1) 
+            throw new Exception("Too many elements given to ArcString");
+        if (value.Count < 0) 
+            throw new Exception("Too few elements given to ArcString");
+        if (value.First == null)
+            throw new Exception();
         Value = new ArcBool(value.First.Value).Value;
     }
     public override string ToString()
@@ -35,24 +39,16 @@ public class ArcBool : Value
         return value;
     }
     public static implicit operator bool(ArcBool d) => d.Value;
-    public static implicit operator ArcBool(bool d) => new ArcBool(d);
+    public static implicit operator ArcBool(bool d) => new(d);
     public Block ToBlock()
     {
         return new Block(Value.ToString());
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         if (v.TypeCode != TypeCode)
             return false;
         return ((ArcBool)v).Value == Value;
-    }
-    public static bool operator ==(ArcBool obj1, Value obj2)
-    {
-        return obj1.Fulfills(obj2);
-    }
-    public static bool operator !=(ArcBool obj1, Value obj2)
-    {
-        return !obj1.Fulfills(obj2);
     }
     public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {

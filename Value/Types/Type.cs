@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Pastel;
 namespace Arc;
 
-public class ArcType : Value
+public class ArcType : IValue
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Type;
     public ValueTypeCode Type;
@@ -23,9 +23,12 @@ public class ArcType : Value
         if (value.Count > 1) throw new Exception("Too many elements given to ArcType");
         if (value.Count < 0) throw new Exception("Too few elements given to ArcType");
 
+        if (value.First == null)
+            throw new Exception();
+
         string vare = value.First.Value.ToString();
         char firstChar = char.ToUpper(vare[0]);
-        vare = firstChar + vare.Substring(1);
+        vare = firstChar + vare[1..];
         if(!Enum.IsDefined(typeof(ValueTypeCode), vare))
         {
             throw new Exception();
@@ -49,7 +52,7 @@ public class ArcType : Value
         i = keywords[Type.ToString().ToLower()](i);
         return i;
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         return v.TypeCode == Type;
     }

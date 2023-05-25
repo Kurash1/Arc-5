@@ -24,7 +24,7 @@ public partial class Compiler
         } while (indent > 0);
         return i;
     }
-    public static bool TryTrimOne(string value, char s, out string newValue)
+    public static bool TryTrimOne(string value, char s, out string? newValue)
     {
         newValue = null;
         if(value == null)
@@ -33,9 +33,9 @@ public partial class Compiler
             return false;
         if (value[0] != s)
             return false;
-        if (value[value.Length - 1] != s)
+        if (value[^1] != s)
             return false;
-        newValue = value.Substring(1, value.Length - 2);
+        newValue = value[1..^1];
         return true;
     }
     public static Block RemoveEnclosingBrackets(Block scope)
@@ -58,7 +58,7 @@ public partial class Compiler
         }
         return i;
     }
-    public Walker TryGetKeyValue(Walker i, out string key, out Block? value)
+    public static Walker TryGetKeyValue(Walker i, out string key, out Block? value)
     {
         key = i.Current;
         
@@ -77,7 +77,7 @@ public partial class Compiler
 
         return i;
     }
-    public Walker GetKeyValue(Walker i, out string key, out Block value)
+    public static Walker GetKeyValue(Walker i, out string key, out Block? value)
     {
         i = TryGetKeyValue(i, out key, out value);
         if (value == null)
@@ -89,13 +89,13 @@ public partial class Compiler
         return string.Join(" ", list);
     }
 
-    public (Dictionary<string, Value> dict, string key) GetNewVariable(string locator)
+    public (Dictionary<string, IValue> dict, string key) GetNewVariable(string locator)
     {
         if (locator.Contains(':'))
         {
             string[] KeyLocator = locator.Split(':');
             int f = 0;
-            Dictionary<string, Value> currentDict = variables;
+            Dictionary<string, IValue> currentDict = variables;
             string currentKey;
             do
             {
@@ -115,23 +115,27 @@ public partial class Compiler
             } while (KeyLocator.Length > f);
         
             if (!currentDict.ContainsKey(currentKey))
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 currentDict.Add(currentKey, null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             return (currentDict, currentKey);
         }
         else
         {
             if (!variables.ContainsKey(locator))
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 variables.Add(locator, null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             return (variables,locator);
         }
     }
-    public bool TryGetVariable(string locator, out Value? var)
+    public bool TryGetVariable(string locator, out IValue? var)
     {
         if (locator.Contains(':'))
         {
             string[] KeyLocator = locator.Split(':');
             int f = 0;
-            Dictionary<string, Value> currentDict = variables;
+            Dictionary<string, IValue> currentDict = variables;
             string currentKey;
             do
             {

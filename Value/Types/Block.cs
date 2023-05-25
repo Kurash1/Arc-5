@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace Arc;
 
-public class ArcBlock : Value
+public class ArcBlock : IValue
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Block;
-    public Block value { get; set; }
+    public Block Value { get; set; }
     public ArcBlock(Block value)
     {
         if(Parser.HasEnclosingBrackets(value))
             value = Compiler.RemoveEnclosingBrackets(value);
-        this.value = value;
+        this.Value = value;
     }
     public Walker Call(Walker i, ref List<string> result, Compiler comp)
     {
-        i = comp.Var(i, (Block s) => Value.Parse(s), false, "args");
+        i = comp.Var(i, (Block s) => IValue.Parse(s), false, "args");
 
-        string compiled = comp.compile(value);
+        string compiled = comp.Compile(Value);
 
         result.Add(compiled);
 
@@ -34,10 +34,10 @@ public class ArcBlock : Value
     {
         throw new Exception();
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         if (v.TypeCode != TypeCode)
             return false;
-        return ((ArcBlock)v).value == value;
+        return ((ArcBlock)v).Value == Value;
     }
 }

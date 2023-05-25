@@ -11,12 +11,12 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile(@"
-list args = {
+        string result = comp.Compile(@"
+list args = [
     kazakh
     khalkha
     korchin
-}
+]
 OR = {
     foreach $culture in args = {
         `primary_culture` = $culture
@@ -28,9 +28,9 @@ object obj = {
     int b = 20
     int c = 30
 }
-list lst = {
+list lst = [
     10 20 30
-}
+]
 foreach kvp in obj = {
     kvp:value = yes
 }

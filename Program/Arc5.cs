@@ -12,7 +12,7 @@ namespace ArcInstance
 {
     public class Instance
     {
-        string directory = AppDomain.CurrentDomain.BaseDirectory;
+        readonly string directory = AppDomain.CurrentDomain.BaseDirectory;
         public void Run(bool a = false)
         {
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en");
@@ -36,24 +36,24 @@ namespace ArcInstance
                 ArcTests.Tests.BlockTest();
                 ArcTests.Tests.PreprocessorTest();
 #endif
-                if(Defines.Target == null)
-                {
-
-                }
-                else
-                {
-                    string fileLocation = Path.Combine(directory, Defines.Target);
-                    string file = File.ReadAllText(fileLocation);
-                    string newFileLocation = fileLocation.Replace(".arc", ".txt");
-                    Transpile(newFileLocation, file);
-                }
-
-                void Transpile(string location, string text)
-                {
-                    Compiler comp = new();
-                    string result = comp.compile(Defines.Headers + text, true);
-                    File.WriteAllText(location, result);
-                }
+                //if(Defines.Target == null)
+                //{
+                //
+                //}
+                //else
+                //{
+                //    string fileLocation = Path.Combine(directory, Defines.Target);
+                //    string file = File.ReadAllText(fileLocation);
+                //    string newFileLocation = fileLocation.Replace(".arc", ".txt");
+                //    Transpile(newFileLocation, file);
+                //}
+                //
+                //void Transpile(string location, string text)
+                //{
+                //    Compiler comp = new();
+                //    string result = comp.compile(Defines.Headers + text, true);
+                //    File.WriteAllText(location, result);
+                //}
 #if !DEBUG
             }
             catch(Exception e) { Console.WriteLine(e.Message); };

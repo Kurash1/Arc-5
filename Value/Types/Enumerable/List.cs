@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 using Pastel;
 namespace Arc;
 
-public class ArcList : ArcEnumerable
+public class ArcList : IArcEnumerable
 {
     public ValueTypeCode TypeCode => ValueTypeCode.List;
-    public LinkedList<Value> List { get; set; }
+    public LinkedList<IValue> List { get; set; }
     public ArcList()
     {
         List = new();
     }
-    public ArcList(LinkedList<Value> value)
+    public ArcList(LinkedList<IValue> value)
     {
         List = value;
     }
@@ -23,7 +23,7 @@ public class ArcList : ArcEnumerable
     {
         List = new();
 
-        if (Parser.HasEnclosingBrackets(code))
+        if (Parser.HasEnclosingBrackets(code, "[", "]"))
             code = Compiler.RemoveEnclosingBrackets(code);
 
         Walker i = new(code);
@@ -31,14 +31,14 @@ public class ArcList : ArcEnumerable
         do
         {
             i = Compiler.GetValue(i, out Block words);
-            List.AddLast(Value.Parse(words));
+            List.AddLast(IValue.Parse(words));
         } while(i.MoveNext());
     }
     public Block ToBlock()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append("{ ");
-        foreach (Value a in List)
+        foreach (IValue a in List)
         {
             sb.Append($"{a.ToBlock()}");
         }
@@ -47,8 +47,8 @@ public class ArcList : ArcEnumerable
     }
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder();
-        foreach (Value val in List)
+        StringBuilder sb = new();
+        foreach (IValue val in List)
         {
             sb.Append($"{val.ToString()} ");
         }
@@ -60,15 +60,15 @@ public class ArcList : ArcEnumerable
     {
         throw new NotImplementedException();
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         if (v.TypeCode != TypeCode)
             return false;
-        LinkedList<Value> vlist = ((ArcList)v).List;
+        LinkedList<IValue> vlist = ((ArcList)v).List;
         if(vlist.Count != List.Count)
             return false;
-        LinkedList<Value>.Enumerator a = List.GetEnumerator();
-        LinkedList<Value>.Enumerator b = vlist.GetEnumerator();
+        LinkedList<IValue>.Enumerator a = List.GetEnumerator();
+        LinkedList<IValue>.Enumerator b = vlist.GetEnumerator();
         while(a.MoveNext() && b.MoveNext())
         {
             if(!a.Current.Fulfills(b.Current))

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Arc;
 
-public class ArcInt : ArcNumber
+public class ArcInt : IArcNumber
 {
     public ValueTypeCode TypeCode => ValueTypeCode.Int;
     public int Value { get; set; }
@@ -20,27 +20,23 @@ public class ArcInt : ArcNumber
     }
     public ArcInt(Block value)
     {
-        if (value.Count > 1) throw new Exception("Too many elements given to ArcString");
-        if (value.Count < 0) throw new Exception("Too few elements given to ArcString");
+        if (value.Count > 1) 
+            throw new Exception("Too many elements given to ArcString");
+        if (value.Count < 0) 
+            throw new Exception("Too few elements given to ArcString");
+        if (value.First == null)
+            throw new Exception();
         Value = new ArcInt(value.First.Value).Value;
     }
     public Block ToBlock()
     {
         return new Block(Value.ToString());
     }
-    public bool Fulfills(Value v)
+    public bool Fulfills(IValue v)
     {
         if (v.TypeCode != TypeCode)
             return false;
         return ((ArcInt)v).Value == Value;
-    }
-    public static bool operator ==(ArcInt obj1, Value obj2)
-    {
-        return obj1.Fulfills(obj2);
-    }
-    public static bool operator !=(ArcInt obj1, Value obj2)
-    {
-        return !obj1.Fulfills(obj2);
     }
 
     public override string ToString()
@@ -52,7 +48,7 @@ public class ArcInt : ArcNumber
         result.Add(ToString());
         return i;
     }
-    public double getNum() => Value;
+    public double GetNum() => Value;
     public static implicit operator double(ArcInt d) => d.Value;
-    public static implicit operator ArcInt(int d) => new ArcInt(d);
+    public static implicit operator ArcInt(int d) => new(d);
 }

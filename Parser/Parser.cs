@@ -12,41 +12,38 @@ public static partial class Parser
     {
         List<(string OldValue, string NewValue)> replaces = new();
 
-        Regex Replace = new Regex("/replace (\\S+) with (\\S+)", RegexOptions.Compiled);
+        Regex Replace = new("/replace (\\S+) with (\\S+)", RegexOptions.Compiled);
         input = Replace.Replace(input, delegate (Match m) {
             replaces.Add((m.Groups[1].Value, m.Groups[2].Value));
             return "";
         });
 
-        foreach (var replace in replaces)
+        foreach ((string OldValue, string NewValue) in replaces)
         {
-            input = input.Replace(replace.OldValue, replace.NewValue);
+            input = input.Replace(OldValue, NewValue);
         }
 
         return input;
     }
     public static Block ParseCode(string str)
     {
-        Block retval = new Block();
+        Block retval = new();
         if (string.IsNullOrWhiteSpace(str)) return retval;
         int ndx = 0;
         string s = "";
         bool insideDoubleQuote = false;
         int indent = 0;
-        int indent2 = 0;
 
         while (ndx < str.Length)
         {
-            if ((str[ndx] == ' ' || str[ndx] == '\n' || str[ndx] == '\t') && !insideDoubleQuote && indent == 0 && indent2 == 0)
+            if ((str[ndx] == ' ' || str[ndx] == '\n' || str[ndx] == '\t') && !insideDoubleQuote && indent == 0)
             {
                 if (!string.IsNullOrWhiteSpace(s.Trim())) retval.AddLast(s.Trim());
                 s = "";
             }
             if (str[ndx] == '"') insideDoubleQuote = !insideDoubleQuote;
             if (str[ndx] == '(') indent++;
-            if (str[ndx] == '[') indent2++;
             if (str[ndx] == ')') indent--;
-            if (str[ndx] == ']') indent2--;
             s += str[ndx];
             ndx++;
         }

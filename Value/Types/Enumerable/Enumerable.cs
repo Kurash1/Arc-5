@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 namespace Arc;
-public interface ArcEnumerable : Value, IEnumerable
+public interface IArcEnumerable : IValue, IEnumerable
 {
     public new IEnumerator GetEnumerator();
 }

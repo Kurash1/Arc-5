@@ -11,7 +11,7 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile($@"
+        string result = comp.Compile($@"
 /replace p@ with globals:provinces:
 /replace :: with globals:
 

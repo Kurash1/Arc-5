@@ -12,7 +12,7 @@ public static partial class Tests
         Compiler comp = new();
         try
         {
-            string result = comp.compile($@"
+            string result = comp.Compile($@"
 int a = 10
 int c = 20
 

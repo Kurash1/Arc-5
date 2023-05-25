@@ -12,13 +12,16 @@ public partial class Compiler
     {
         i.MoveNext(); 
 
-        i = TryGetKeyValue(i, out string key, out Block value);
+        i = TryGetKeyValue(i, out string key, out Block? value);
 
-        if(TryGetVariable(key, out Value? left))
+        if(TryGetVariable(key, out IValue? left))
         {
+            if (left == null)
+                throw new Exception();
+
             if (value != null)
             {
-                Value right = Value.Parse(value);
+                IValue right = IValue.Parse(value);
                 
                 if (!right.Fulfills(left))
                 {

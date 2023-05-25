@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 namespace Arc;
-public interface ArcNumber : Value
+public interface IArcNumber : IValue
 {
-    public double getNum();
+    public double GetNum();
 }

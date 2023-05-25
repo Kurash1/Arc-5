@@ -12,7 +12,7 @@ public partial class Compiler
     {
         i.MoveNext(); //Previous is the inherit word
 
-        (Dictionary<string, Value> dict, string key) variable = GetNewVariable(i.Current);
+        (Dictionary<string, IValue> dict, string key) = GetNewVariable(i.Current);
 
         i.MoveNext();
 
@@ -21,10 +21,9 @@ public partial class Compiler
 
         i.MoveNext();
 
-        Value? enumerableObject;
-        if (!TryGetVariable(i.Current, out enumerableObject))
+        if (!TryGetVariable(i.Current, out IValue? enumerableObject))
             throw new Exception();
-        if(enumerableObject == null)
+        if (enumerableObject == null)
             throw new Exception();
 
         i.MoveNext();
@@ -34,38 +33,37 @@ public partial class Compiler
 
         i.MoveNext();
 
-        Block codeblock;
-        GetValue(i, out codeblock);
+        GetValue(i, out Block codeblock);
 
-        if(Parser.HasEnclosingBrackets(codeblock))
+        if (Parser.HasEnclosingBrackets(codeblock))
             RemoveEnclosingBrackets(codeblock);
 
         if(enumerableObject.TypeCode == ValueTypeCode.Object)
         {
-            foreach (KeyValuePair<string, Value> kvp in (ArcObject)enumerableObject)
+            foreach (KeyValuePair<string, IValue> kvp in (ArcObject)enumerableObject)
             {
                 if (kvp.Key == "global")
                     continue;
-                variable.dict[variable.key] = new ArcObject(new Dictionary<string, Value>()
+                dict[key] = new ArcObject(new Dictionary<string, IValue>()
                 {
                     { "key", new ArcString(kvp.Key) },
                     { "value", kvp.Value }
                 });
 
-                result.Add(compile(codeblock));
+                result.Add(Compile(codeblock));
 
-                variable.dict.Remove(variable.key);
+                dict.Remove(key);
             }
         }
         else if(enumerableObject.TypeCode == ValueTypeCode.List)
         {
-            foreach (Value value in (ArcList)enumerableObject)
+            foreach (IValue value in (ArcList)enumerableObject)
             {
-                variable.dict[variable.key] = value;
+                dict[key] = value;
 
-                result.Add(compile(codeblock));
+                result.Add(Compile(codeblock));
 
-                variable.dict.Remove(variable.key);
+                dict.Remove(key);
             }
         }
 

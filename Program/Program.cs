@@ -1,6 +1,6 @@
 ﻿using ArcInstance;
 
-Instance arc = new Instance();
+Instance arc = new();
 #if !DEBUG
 try
 {

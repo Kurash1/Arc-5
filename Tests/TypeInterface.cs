@@ -11,7 +11,7 @@ public static partial class Tests
     {
         Compiler comp = new();
 
-        string result = comp.compile($@"
+        string result = comp.Compile($@"
 interface country = {{
   type name = string
   type adj = string
@@ -49,6 +49,10 @@ h h2 = {{
     test test test
 }}
         ").Trim();
+
+        if (!ResultMatches(result, @"
+
+")) throw new Exception();
 
         Console.WriteLine("Success on Type And Interface Test");
     }

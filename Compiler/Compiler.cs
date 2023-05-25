@@ -11,11 +11,11 @@ namespace Arc
 {
     public partial class Compiler
     {
-       public Dictionary<string, Value> variables = new()
+       public Dictionary<string, IValue> variables = new()
         {
             { "global", global }
         };
-        public static ArcObject global = new ArcObject();
+        public static ArcObject global = new();
 
 #pragma warning disable CS8618 // Fields are assigned by Arc5.cs
         public static string directory;
@@ -23,13 +23,13 @@ namespace Arc
 #pragma warning restore CS8618
 
         public Compiler() { }
-        public string compile(string file, bool preprocessor = false)
+        public string Compile(string file, bool preprocessor = false)
         {
             if (preprocessor)
                 file = Parser.Preprocessor(file);
-            return compile(Parser.ParseCode(file));
+            return Compile(Parser.ParseCode(file));
         }
-        public string compile(Block code)
+        public string Compile(Block code)
         {
             
             List<string> result = new();
@@ -39,7 +39,7 @@ namespace Arc
                 { "bool", (Walker i) => Var(i, (Block s) => new ArcBool(s) ) },
                 { "float", (Walker i) => Var(i, (Block s) => new ArcFloat(s) ) },
                 { "int", (Walker i) => Var(i, (Block s) => new ArcInt(s) ) },
-                { "var", (Walker i) => Var(i, (Block s) => Value.Parse(s) ) },
+                { "var", (Walker i) => Var(i, (Block s) => IValue.Parse(s) ) },
                 { "object", (Walker i) => Var(i, (Block s) => new ArcObject(s) ) },
                 { "block", (Walker i) => Var(i, (Block s) => new ArcBlock(s) ) },
                 { "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
@@ -58,7 +58,7 @@ namespace Arc
                     g = keywords[g.Current].Invoke(g);
                     continue;
                 }
-                else if (TryGetVariable(g.Current, out Value? variable))
+                else if (TryGetVariable(g.Current, out IValue? variable))
                 {
                     if(variable != null)
                     {
@@ -66,8 +66,10 @@ namespace Arc
                     }
                     continue;
                 }
-                else if(TryTrimOne(g.Current, '`', out string newValue))
+                else if(TryTrimOne(g.Current, '`', out string? newValue))
                 {
+                    if (newValue == null)
+                        throw new Exception();
                     result.Add(newValue);
                     continue;
                 }

@@ -14,7 +14,7 @@ public static class Defines
     public static void GetDefines(string filepath)
     {
         string file = File.ReadAllText(filepath);
-        ArcObject defines = new ArcObject(Parser.ParseCode(file));
+        ArcObject defines = new(Parser.ParseCode(file));
 
         if(defines.Properties.ContainsKey("headers"))
             Headers = ((ArcString)defines["headers"]).Value.Trim('"');
