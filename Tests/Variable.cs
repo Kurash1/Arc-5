@@ -9,26 +9,26 @@ using Arc;
 namespace ArcTests;
 public static partial class Tests
 {
-    public static void VariableTest()
-    {
-        Compiler comp = new();
+	public static void VariableTest()
+	{
+		Compiler comp = new();
 
-        string result = comp.Compile(@"
+		string result = comp.Compile(@"
 object FirstLayer = {
-    string hello = ""World""
-    bool true = yes
-    bool false = no
-    float pi = 3.14
-    int i = 0
-    object SecondLayer = {
-        string hello = ""Wrld""
-        list test = [
-            100 200 300
-        ]
-        test2 = [
-            100 200 300
-        ]
-    }
+	string hello = ""World""
+	bool true = yes
+	bool false = no
+	float pi = 3.14
+	int i = 0
+	object SecondLayer = {
+		string hello = ""Wrld""
+		list test = [
+			100 200 300
+		]
+		test2 = [
+			100 200 300
+		]
+	}
 }
 string HelloGet = FirstLayer:hello
 string NumAsString = 121
@@ -38,42 +38,42 @@ object global:GlobalObject = {
 }
 
 FirstLayer:SecondLayer:hello = HelloGet
-        ").Trim();
+		").Trim();
 
-        ArcObject expected = new(new Dictionary<string, IValue>(){
-                { "global", Compiler.global },
-                { "hello", new ArcString("\"World\"") },
-                { "true", new ArcBool(true) },
-                { "false", new ArcBool(false) },
-                { "pi", new ArcFloat(3.14) },
-                { "i", new ArcInt(0) },
-                { "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
-                    { "hello", new ArcString("\"Wrld\"") },
-                    { "test", new ArcList(new LinkedList<IValue>(new[]
-                        {
-                            new ArcInt(100),
-                            new ArcInt(200),
-                            new ArcInt(300)
-                        }
-                    ))},
-                    { "test2", new ArcList(new LinkedList<IValue>(new[]
-                        {
-                            new ArcInt(100),
-                            new ArcInt(200),
-                            new ArcInt(300)
-                        }
-                    ))}
-                }) }
-            });
+		ArcObject expected = new(new Dictionary<string, IValue>(){
+				{ "global", Compiler.global },
+				{ "hello", new ArcString("\"World\"") },
+				{ "true", new ArcBool(true) },
+				{ "false", new ArcBool(false) },
+				{ "pi", new ArcFloat(3.14) },
+				{ "i", new ArcInt(0) },
+				{ "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
+					{ "hello", new ArcString("\"Wrld\"") },
+					{ "test", new ArcList(new LinkedList<IValue>(new[]
+						{
+							new ArcInt(100),
+							new ArcInt(200),
+							new ArcInt(300)
+						}
+					))},
+					{ "test2", new ArcList(new LinkedList<IValue>(new[]
+						{
+							new ArcInt(100),
+							new ArcInt(200),
+							new ArcInt(300)
+						}
+					))}
+				}) }
+			});
 
-        if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
-            throw new Exception("Failure on Variable Test");
+		if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
+			throw new Exception("Failure on Variable Test");
 
-        if (!ResultMatches(result, @"
+		if (!ResultMatches(result, @"
 ""Wrld"" = ""World""
 "))
-            throw new Exception("Failure on Variable Test");
+			throw new Exception("Failure on Variable Test");
 
-        Console.WriteLine("Success on Variable Test");
-    }
+		Console.WriteLine("Success on Variable Test");
+	}
 }

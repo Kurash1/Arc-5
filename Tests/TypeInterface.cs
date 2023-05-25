@@ -7,11 +7,11 @@ using Arc;
 namespace ArcTests;
 public static partial class Tests
 {
-    public static void TypeAndInterfaceTest()
-    {
-        Compiler comp = new();
+	public static void TypeAndInterfaceTest()
+	{
+		Compiler comp = new();
 
-        string result = comp.Compile($@"
+		string result = comp.Compile($@"
 interface country = {{
   type name = string
   type adj = string
@@ -37,23 +37,23 @@ b b2 = 10
 c c2 = 10.1
 d d2 = ""Hello""
 e e2 = {{
-    string test = ""Hello""
+	string test = ""Hello""
 }}
 f f2 = {{
-    test test test
+	test test test
 }}
 
 g g2 = bool
 
 h h2 = {{
-    test test test
+	test test test
 }}
-        ").Trim();
+		").Trim();
 
-        if (!ResultMatches(result, @"
+		if (!ResultMatches(result, @"
 
 ")) throw new Exception();
 
-        Console.WriteLine("Success on Type And Interface Test");
-    }
+		Console.WriteLine("Success on Type And Interface Test");
+	}
 }

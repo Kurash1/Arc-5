@@ -8,32 +8,32 @@ namespace Arc;
 
 public partial class Compiler
 {
-    public Walker Require(Walker i)
-    {
-        i.MoveNext(); 
+	public Walker Require(Walker i)
+	{
+		i.MoveNext(); 
 
-        i = TryGetKeyValue(i, out string key, out Block? value);
+		i = TryGetKeyValue(i, out string key, out Block? value);
 
-        if(TryGetVariable(key, out IValue? left))
-        {
-            if (left == null)
-                throw new Exception();
+		if(TryGetVariable(key, out IValue? left))
+		{
+			if (left == null)
+				throw new Exception();
 
-            if (value != null)
-            {
-                IValue right = IValue.Parse(value);
-                
-                if (!right.Fulfills(left))
-                {
-                    throw new Exception();
-                }
-            }
-        }
-        else
-        {
-            throw new Exception();
-        }
+			if (value != null)
+			{
+				IValue right = IValue.Parse(value);
+				
+				if (!right.Fulfills(left))
+				{
+					throw new Exception();
+				}
+			}
+		}
+		else
+		{
+			throw new Exception();
+		}
 
-        return i;
-    }
+		return i;
+	}
 }

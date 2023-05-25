@@ -7,39 +7,39 @@ using Arc;
 namespace ArcTests;
 public static partial class Tests
 {
-    public static void ForeachTest()
-    {
-        Compiler comp = new();
+	public static void ForeachTest()
+	{
+		Compiler comp = new();
 
-        string result = comp.Compile(@"
+		string result = comp.Compile(@"
 list args = [
-    kazakh
-    khalkha
-    korchin
+	kazakh
+	khalkha
+	korchin
 ]
 OR = {
-    foreach $culture in args = {
-        `primary_culture` = $culture
-    }
+	foreach $culture in args = {
+		`primary_culture` = $culture
+	}
 }
 
 object obj = {
-    int a = 10
-    int b = 20
-    int c = 30
+	int a = 10
+	int b = 20
+	int c = 30
 }
 list lst = [
-    10 20 30
+	10 20 30
 ]
 foreach kvp in obj = {
-    kvp:value = yes
+	kvp:value = yes
 }
 foreach value in lst = {
-    value = yes
+	value = yes
 }
-        ").Trim();
+		").Trim();
 
-        if (!ResultMatches(result, @"
+		if (!ResultMatches(result, @"
 OR = {
 	primary_culture = kazakh
 	primary_culture = khalkha
@@ -52,8 +52,8 @@ OR = {
 20 = yes
 30 = yes
 "))
-            throw new Exception();
+			throw new Exception();
 
-        Console.WriteLine("Success on Foreach Test");
-    }
+		Console.WriteLine("Success on Foreach Test");
+	}
 }

@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 namespace Arc;
 public interface IArcNumber : IValue
 {
-    public double GetNum();
+	public double GetNum();
 }

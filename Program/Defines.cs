@@ -8,21 +8,21 @@ namespace Arc;
 
 public static class Defines
 {
-    public static string? Target;
-    public static bool Formatting = false;
-    public static string Headers = "";
-    public static void GetDefines(string filepath)
-    {
-        string file = File.ReadAllText(filepath);
-        ArcObject defines = new(Parser.ParseCode(file));
+	public static string? Target;
+	public static bool Formatting = false;
+	public static string Headers = "";
+	public static void GetDefines(string filepath)
+	{
+		string file = File.ReadAllText(filepath);
+		ArcObject defines = new(Parser.ParseCode(file));
 
-        if(defines.Properties.ContainsKey("headers"))
-            Headers = ((ArcString)defines["headers"]).Value.Trim('"');
+		if(defines.Properties.ContainsKey("headers"))
+			Headers = ((ArcString)defines["headers"]).Value.Trim('"');
 
-        if(defines.Properties.ContainsKey("formatting"))
-            Formatting = ((ArcBool)defines["formatting"]).Value;
+		if(defines.Properties.ContainsKey("formatting"))
+			Formatting = ((ArcBool)defines["formatting"]).Value;
 
-        if(defines.Properties.ContainsKey("target"))
-            Target = ((ArcString)defines["target"]).Value.Trim('"');
-    }
+		if(defines.Properties.ContainsKey("target"))
+			Target = ((ArcString)defines["target"]).Value.Trim('"');
+	}
 }

@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace Arc;
 public interface IArcEnumerable : IValue, IEnumerable
 {
-    public new IEnumerator GetEnumerator();
+	public new IEnumerator GetEnumerator();
 }
