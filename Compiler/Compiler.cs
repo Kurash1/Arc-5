@@ -11,9 +11,9 @@ namespace Arc
 {
 	public partial class Compiler
 	{
-	   public Dictionary<string, IValue> variables = new()
+	   public Dictionary<string, Pointer> variables = new()
 		{
-			{ "global", global }
+			{ "global", new Pointer("global") }
 		};
 		public static ArcObject global = new();
 
@@ -23,14 +23,20 @@ namespace Arc
 #pragma warning restore CS8618
 
 		public Compiler() { }
-		public string Compile(string file, bool preprocessor = false)
+		public string Compile(string file, bool preprocessor = false, Defines? def = null)
 		{
+			if (def == null)
+				def = Defines.Global;
+
 			if (preprocessor)
 				file = Parser.Preprocessor(file);
-			return Compile(Parser.ParseCode(file));
+
+			return Compile(Parser.ParseCode(file), def);
 		}
-		public string Compile(Block code)
+		public string Compile(Block code, Defines? def = null)
 		{
+			if (def == null)
+				def = Defines.Global;
 			
 			List<string> result = new();
 			Dictionary<string, Func<Walker, Walker>> keywords = new()
@@ -44,10 +50,12 @@ namespace Arc
 				{ "block", (Walker i) => Var(i, (Block s) => new ArcBlock(s) ) },
 				{ "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
 				{ "list", (Walker i) => Var(i, (Block s) => new ArcList(s) ) },
+				{ "array", (Walker i) => Var(i, (Block s) => new ArcArray(s) ) },
 				{ "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },
 				{ "inherit", (Walker i) => Inherit(i) },
 				{ "require", (Walker i) => Require(i) },
 				{ "foreach", (Walker i) => Foreach(i, ref result) },
+				{ "run", (Walker i) => Run(i) },
 			};
 
 			Walker g = new(code);
@@ -58,11 +66,11 @@ namespace Arc
 					g = keywords[g.Current].Invoke(g);
 					continue;
 				}
-				else if (TryGetVariable(g.Current, out IValue? variable))
+				else if (TryGetVariable(g.Current, out Pointer? variable))
 				{
 					if(variable != null)
 					{
-						g = variable.Call(g, ref result, this);
+						g = variable.Value.Call(g, ref result, this);
 					}
 					continue;
 				}
@@ -70,6 +78,12 @@ namespace Arc
 				{
 					if (newValue == null)
 						throw new Exception();
+
+					Regex Replace = new("{([^}]+)}", RegexOptions.Compiled);
+					newValue = Replace.Replace(newValue, delegate (Match m) {
+						return Compile(m.Groups[1].Value).Trim();
+					});
+
 					result.Add(newValue);
 					continue;
 				}
@@ -83,7 +97,7 @@ namespace Arc
 				res.Append($"{s.Trim()} ");
 			}
 
-			if (Defines.Formatting)
+			if (def.GetFormatting())
 				return Parser.FormatCode(res.ToString());
 			else
 				return res.ToString();

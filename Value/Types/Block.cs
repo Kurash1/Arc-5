@@ -30,10 +30,6 @@ public class ArcBlock : IValue
 	{
 		throw new Exception();
 	}
-	public Block ToBlock()
-	{
-		throw new Exception();
-	}
 	public bool Fulfills(IValue v)
 	{
 		if (v.TypeCode != TypeCode)

@@ -14,7 +14,7 @@ public partial class Compiler
 
 		i = TryGetKeyValue(i, out string key, out Block? value);
 
-		if(TryGetVariable(key, out IValue? left))
+		if(TryGetVariable(key, out Pointer? left))
 		{
 			if (left == null)
 				throw new Exception();
@@ -23,7 +23,7 @@ public partial class Compiler
 			{
 				IValue right = IValue.Parse(value);
 				
-				if (!right.Fulfills(left))
+				if (!right.Fulfills(left.Value))
 				{
 					throw new Exception();
 				}

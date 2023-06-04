@@ -89,26 +89,36 @@ public partial class Compiler
 		return string.Join(" ", list);
 	}
 
-	public (Dictionary<string, IValue> dict, string key) GetNewVariable(string locator)
+	public (Dictionary<string, Pointer> dict, string key) GetNewVariable(string locator)
+	{
+		return GetNewVariable(variables, locator);
+	}
+	public static (Dictionary<string, Pointer> dict, string key) GetNewVariable(Dictionary<string, Pointer> vars, string locator)
 	{
 		if (locator.Contains(':'))
 		{
 			string[] KeyLocator = locator.Split(':');
 			int f = 0;
-			Dictionary<string, IValue> currentDict = variables;
+			Dictionary<string, Pointer> currentDict = vars;
 			string currentKey;
 			do
 			{
 				currentKey = KeyLocator[f];
 				if (currentDict.ContainsKey(currentKey))
 				{
-					if (currentDict[currentKey].TypeCode == ValueTypeCode.Object)
+					if (currentDict[currentKey].Value.TypeCode == ValueTypeCode.Object)
 					{
-						currentDict = ((ArcObject)currentDict[currentKey]).Properties;
+						currentDict = ((ArcObject)currentDict[currentKey].Value).Properties;
 					}
 					else
 					{
-						throw new Exception($"Tried assigning to a key in a nonobjectKey");
+						if (KeyLocator.Length > f + 1)
+							throw new Exception($"Tried assigning to a key in a nonobjectKey");
+						else
+						{
+							f++;
+							continue;
+						}
 					}
 				}
 				f++;
@@ -122,20 +132,24 @@ public partial class Compiler
 		}
 		else
 		{
-			if (!variables.ContainsKey(locator))
+			if (!vars.ContainsKey(locator))
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-				variables.Add(locator, null);
+				vars.Add(locator, null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-			return (variables,locator);
+			return (vars, locator);
 		}
 	}
-	public bool TryGetVariable(string locator, out IValue? var)
+	public bool TryGetVariable(string locator, out Pointer? var)
+	{
+		return TryGetVariable(variables, locator, out var);
+	}
+	public static bool TryGetVariable(Dictionary<string, Pointer> vars, string locator, out Pointer? var)
 	{
 		if (locator.Contains(':'))
 		{
 			string[] KeyLocator = locator.Split(':');
 			int f = 0;
-			Dictionary<string, IValue> currentDict = variables;
+			Dictionary<string, Pointer> currentDict = vars;
 			string currentKey;
 			do
 			{
@@ -144,9 +158,9 @@ public partial class Compiler
 				{
 					if (KeyLocator.Length > f + 1)
 					{
-						if (currentDict[currentKey].TypeCode == ValueTypeCode.Object)
+						if (currentDict[currentKey].Value.TypeCode == ValueTypeCode.Object)
 						{
-							currentDict = ((ArcObject)currentDict[currentKey]).Properties;
+							currentDict = ((ArcObject)currentDict[currentKey].Value).Properties;
 						}
 					}
 				}
@@ -167,12 +181,12 @@ public partial class Compiler
 		}
 		else
 		{
-			if (!variables.ContainsKey(locator))
+			if (!vars.ContainsKey(locator))
 			{
 				var = null;
 				return false;
 			}
-			var = variables[locator];
+			var = vars[locator];
 			return true;
 		}
 	}

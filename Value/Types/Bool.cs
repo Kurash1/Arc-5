@@ -40,10 +40,6 @@ public class ArcBool : IValue
 	}
 	public static implicit operator bool(ArcBool d) => d.Value;
 	public static implicit operator ArcBool(bool d) => new(d);
-	public Block ToBlock()
-	{
-		return new Block(Value.ToString());
-	}
 	public bool Fulfills(IValue v)
 	{
 		if (v.TypeCode != TypeCode)
@@ -52,7 +48,7 @@ public class ArcBool : IValue
 	}
 	public Walker Call(Walker i, ref List<string> result, Compiler comp)
 	{
-		result.Add(ToString());
+		result.Add(ToString().Replace("True", "yes").Replace("False", "no"));
 		return i;
 	}
 }

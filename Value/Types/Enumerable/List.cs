@@ -10,12 +10,12 @@ namespace Arc;
 public class ArcList : IArcEnumerable
 {
 	public ValueTypeCode TypeCode => ValueTypeCode.List;
-	public LinkedList<IValue> List { get; set; }
+	public LinkedList<Pointer> List { get; set; }
 	public ArcList()
 	{
 		List = new();
 	}
-	public ArcList(LinkedList<IValue> value)
+	public ArcList(LinkedList<Pointer> value)
 	{
 		List = value;
 	}
@@ -31,20 +31,43 @@ public class ArcList : IArcEnumerable
 		do
 		{
 			i = Compiler.GetValue(i, out Block words);
-			List.AddLast(IValue.Parse(words));
+			IValue newValue = IValue.Parse(words);
+			List.AddLast(new Pointer(ref newValue));
 		} while(i.MoveNext());
 	}
-	public Block ToBlock()
+	public ArcList(Block code, LinkedList<Pointer> arr)
 	{
-		StringBuilder sb = new();
-		sb.Append("{ ");
-		foreach (IValue a in List)
+		List = new();
+
+		if (Parser.HasEnclosingBrackets(code, "[", "]"))
+			code = Compiler.RemoveEnclosingBrackets(code);
+
+		Walker i = new(code);
+
+		Dictionary<string, Func<Block, IValue>> keywords = new()
 		{
-			sb.Append($"{a.ToBlock()}");
+			{ "string", (Block s) => new ArcString(s) },
+			{ "bool", (Block s) => new ArcBool(s) },
+			{ "float", (Block s) => new ArcFloat(s) },
+			{ "int", (Block s) => new ArcInt(s) },
+			{ "object", (Block s) => new ArcObject(s) },
+			{ "block", (Block s) => new ArcBlock(s) },
+			{ "interface", (Block s) => new ArcInterface(s) },
+			{ "list", (Block s) => new ArcList(s) },
+			{ "array", (Block s) => new ArcArray(s) },
+			{ "type", (Block s) => new ArcType(s) }
+		};
+
+		foreach(Pointer pointer in arr)
+		{
+			i = Compiler.GetValue(i, out Block words);
+			IValue newValue = keywords[((ArcType)pointer.Value).Type.ToString().ToLower()](words);
+			List.AddLast(new Pointer(ref newValue));
+			if (!i.MoveNext())
+				throw new Exception();
 		}
-		sb.Append(" }");
-		return Parser.ParseCode(sb.ToString());
 	}
+
 	public override string ToString()
 	{
 		StringBuilder sb = new();
@@ -64,14 +87,14 @@ public class ArcList : IArcEnumerable
 	{
 		if (v.TypeCode != TypeCode)
 			return false;
-		LinkedList<IValue> vlist = ((ArcList)v).List;
+		LinkedList<Pointer> vlist = ((ArcList)v).List;
 		if(vlist.Count != List.Count)
 			return false;
-		LinkedList<IValue>.Enumerator a = List.GetEnumerator();
-		LinkedList<IValue>.Enumerator b = vlist.GetEnumerator();
+		LinkedList<Pointer>.Enumerator a = List.GetEnumerator();
+		LinkedList<Pointer>.Enumerator b = vlist.GetEnumerator();
 		while(a.MoveNext() && b.MoveNext())
 		{
-			if(!a.Current.Fulfills(b.Current))
+			if(!a.Current.Value.Fulfills(b.Current.Value))
 				return false;
 		}
 		return true;

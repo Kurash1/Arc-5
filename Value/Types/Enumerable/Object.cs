@@ -10,49 +10,78 @@ namespace Arc;
 public class ArcObject : IArcEnumerable
 {
 	public ValueTypeCode TypeCode => ValueTypeCode.Object;
-	public Dictionary<string, IValue> Properties;
+	public Dictionary<string, Pointer> Properties;
 	public ArcObject()
 	{
-		Properties = new Dictionary<string, IValue>();
+		Properties = new();
 	}
-	public ArcObject(Dictionary<string, IValue> value)
+	public ArcObject(Dictionary<string, Pointer> value)
 	{
 		Properties = value;
 	}
-	public ArcObject(Block code)
+	public ArcObject(Block code, ArcInterface? Interface = null)
 	{
-		Properties = new Dictionary<string, IValue>();
+		Properties = new Dictionary<string, Pointer>()
+		{
+			{ "global", new Pointer("global") }
+		};
 
 		if (Parser.HasEnclosingBrackets(code))
 			code = Compiler.RemoveEnclosingBrackets(code);
 
-		if (code.First != null)
+		if(code.Count == 0) return;
+
+		Dictionary<string, Func<Walker, bool, Walker>> keywords = new()
 		{
-			Compiler comp = new();
+			{ "string", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcString(s), move) },
+			{ "bool", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcBool(s), move) },
+			{ "float", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcFloat(s), move) },
+			{ "int", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcInt(s), move) },
+			{ "object", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcObject(s), move) },
+			{ "block", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcBlock(s), move) },
+			{ "interface", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcInterface(s), move) },
+			{ "list", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcList(s), move) },
+			{ "array", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcArray(s), move) },
+			{ "type", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcType(s), move) },
+			{ "inherit", (Walker i, bool _) => Compiler.Inherit(i, Properties) }
+		};
 
-			string result = comp.Compile(code);
-			
-			Block newBlock = Parser.ParseCode(result);
-			if (newBlock.First != null)
+		Walker i = new(code);
+
+		do
+		{
+			if (keywords.ContainsKey(i.Current))
 			{
-				Walker i = new(newBlock);
-				do
+				i = keywords[i.Current].Invoke(i, true);
+				continue;
+			}
+			else if(Interface != null && Interface.Properties.ContainsKey(i.Current))
+			{
+				if(Interface[i.Current].Value.TypeCode == ValueTypeCode.Type)
 				{
-					i = comp.Var(i, (Block s) => IValue.Parse(s), false);
-				} while (i.MoveNext());
+					i = keywords[
+							((ArcType)Interface[i.Current].Value).Type.ToString().ToLower()
+						].Invoke(i, false);
+				}
+				else
+				{
+					i = keywords[
+							Interface[i.Current].Value.TypeCode.ToString().ToLower()
+						].Invoke(i, false);
+				}
 			}
-
-			foreach (KeyValuePair<string, IValue> kvp in comp.variables)
+			else
 			{
-				Properties.Add(kvp.Key, kvp.Value);
+				Compiler.Var(Properties, i, (Block s) => IValue.Parse(s), false);
+				continue;
 			}
-		}
+		} while (i.MoveNext());
 	}
 	public Walker Call(Walker i, ref List<string> result, Compiler comp)
 	{
 		throw new NotImplementedException();
 	}
-	public IValue this[string key]
+	public Pointer this[string key]
 	{
 		get
 		{
@@ -70,28 +99,16 @@ public class ArcObject : IArcEnumerable
 	{
 		if (v.TypeCode != TypeCode)
 			return false;
-		foreach(KeyValuePair<string, IValue> kvp in ((ArcObject)v).Properties)
+		foreach(KeyValuePair<string, Pointer> kvp in ((ArcObject)v).Properties)
 		{
 			if (kvp.Key == "global")
 				continue;
 			if (!Properties.ContainsKey(kvp.Key))
 				return false;
-			if(!Properties[kvp.Key].Fulfills(kvp.Value))
+			if(!Properties[kvp.Key].Value.Fulfills(kvp.Value.Value))
 				return false;
 		}
 		return true;
-	}
-	public Block ToBlock()
-	{
-		StringBuilder sb = new();
-		sb.Append("{ ");
-		foreach(KeyValuePair<string, IValue> kvp in Properties)
-		{
-			if (kvp.Key != "global")
-				sb.Append($"{kvp.Value.TypeCode.ToString()} {kvp.Key} = {kvp.Value.ToBlock()}");
-		}
-		sb.Append(" }");
-		return Parser.ParseCode(sb.ToString());
 	}
 	public new static string ToString() => "[Arc Object]";
 

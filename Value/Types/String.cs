@@ -34,10 +34,6 @@ public class ArcString : IValue
 	{
 		return Value;
 	}
-	public Block ToBlock()
-	{
-		return new Block(Value);
-	}
 	public bool Fulfills(IValue v)
 	{
 		if(v.TypeCode != TypeCode)

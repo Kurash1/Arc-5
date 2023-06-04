@@ -12,6 +12,7 @@ public enum ValueTypeCode
 	Object,
 	List,
 	Interface,
+	Array,
 	Type,
 	Block
 }
@@ -22,10 +23,18 @@ public interface IValue
 	{
 		if(s.Count != 1)
 		{
-			try { return new ArcObject(s); }
-			catch (Exception) { }
-			try { return new ArcList(s); }
-			catch (Exception) { }
+			if (Parser.HasEnclosingBrackets(s))
+			{
+				try { return new ArcObject(s); }
+				catch (Exception) { }
+				try { return new ArcBlock(s); }
+				catch (Exception) { }
+			}
+			else if (Parser.HasEnclosingBrackets(s, "[", "]"))
+			{
+				try { return new ArcList(s); }
+				catch (Exception) { }
+			}
 		}
 		else
 		{
@@ -43,7 +52,6 @@ public interface IValue
 		throw new Exception("Unrecognized variable type");
 	}
 	public bool Fulfills(IValue v);
-	public Block ToBlock();
 	public Walker Call(Walker i, ref List<string> result, Compiler comp);
 	bool IsNumber() => (TypeCode == ValueTypeCode.Float || TypeCode == ValueTypeCode.Int);
 }

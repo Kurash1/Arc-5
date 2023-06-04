@@ -10,6 +10,10 @@ public partial class Compiler
 {
 	public Walker Inherit(Walker i)
 	{
+		return Inherit(i, variables);
+	}
+	public static Walker Inherit(Walker i, Dictionary<string, Pointer> vars)
+	{
 		i.MoveNext(); //Previous is the inherit word
 
 		if (!Parser.equal.IsMatch(i.Current))
@@ -17,18 +21,18 @@ public partial class Compiler
 
 		i.MoveNext();
 
-		if (TryGetVariable(i.Current, out IValue? variable))
+		if (TryGetVariable(vars, i.Current, out Pointer? variable))
 		{
 			if(variable == null)
 				throw new Exception();
 
-			if(variable.TypeCode == ValueTypeCode.Object)
+			if(variable.Value.TypeCode == ValueTypeCode.Object)
 			{
-				ArcObject var = (ArcObject)variable;
-				foreach (KeyValuePair<string, IValue> kvp in var.Properties)
+				ArcObject var = (ArcObject)variable.Value;
+				foreach (KeyValuePair<string, Pointer> kvp in var.Properties)
 				{
 					if(kvp.Key != "global")
-						variables.Add(kvp.Key, kvp.Value);
+						vars.Add(kvp.Key, kvp.Value);
 				}
 			}
 			else

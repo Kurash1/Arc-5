@@ -56,10 +56,6 @@ public class ArcType : IValue
 	{
 		return v.TypeCode == Type;
 	}
-	public Block ToBlock()
-	{
-		return Parser.ParseCode(Type.ToString());
-	}
 	public override string ToString()
 	{
 		return Type.ToString();

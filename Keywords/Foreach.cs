@@ -12,7 +12,7 @@ public partial class Compiler
 	{
 		i.MoveNext(); //Previous is the inherit word
 
-		(Dictionary<string, IValue> dict, string key) = GetNewVariable(i.Current);
+		(Dictionary<string, Pointer> dict, string key) = GetNewVariable(i.Current);
 
 		i.MoveNext();
 
@@ -21,7 +21,7 @@ public partial class Compiler
 
 		i.MoveNext();
 
-		if (!TryGetVariable(i.Current, out IValue? enumerableObject))
+		if (!TryGetVariable(i.Current, out Pointer? enumerableObject))
 			throw new Exception();
 		if (enumerableObject == null)
 			throw new Exception();
@@ -38,28 +38,31 @@ public partial class Compiler
 		if (Parser.HasEnclosingBrackets(codeblock))
 			RemoveEnclosingBrackets(codeblock);
 
-		if(enumerableObject.TypeCode == ValueTypeCode.Object)
+		if(enumerableObject.Value.TypeCode == ValueTypeCode.Object)
 		{
-			foreach (KeyValuePair<string, IValue> kvp in (ArcObject)enumerableObject)
+			foreach (KeyValuePair<string, Pointer> kvp in (ArcObject)enumerableObject.Value)
 			{
 				if (kvp.Key == "global")
 					continue;
-				dict[key] = new ArcObject(new Dictionary<string, IValue>()
+				IValue Newkey = new ArcString(kvp.Key);
+				IValue NewValue = new ArcObject(new Dictionary<string, Pointer>()
 				{
-					{ "key", new ArcString(kvp.Key) },
-					{ "value", kvp.Value }
+					{ "key", new Pointer(ref Newkey) },
+					{ "value", new Pointer(ref kvp.Value.Value) }
 				});
+				dict[key] = new Pointer(ref NewValue);
 
 				result.Add(Compile(codeblock));
 
 				dict.Remove(key);
 			}
 		}
-		else if(enumerableObject.TypeCode == ValueTypeCode.List)
+		else if(enumerableObject.Value.TypeCode == ValueTypeCode.List)
 		{
-			foreach (IValue value in (ArcList)enumerableObject)
+			ArcList lst = (ArcList)enumerableObject.Value;
+			foreach(Pointer val in lst)
 			{
-				dict[key] = value;
+				dict[key] = new Pointer(ref val.Value);
 
 				result.Add(Compile(codeblock));
 

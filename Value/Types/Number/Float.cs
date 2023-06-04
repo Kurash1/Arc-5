@@ -39,10 +39,6 @@ public class ArcFloat : IArcNumber
 	public double GetNum() => Value;
 	public static implicit operator double(ArcFloat d) => d.Value;
 	public static implicit operator ArcFloat(double d) => new(d);
-	public Block ToBlock()
-	{
-		return new Block(Value.ToString());
-	}
 	public bool Fulfills(IValue v)
 	{
 		if (v.TypeCode != TypeCode)

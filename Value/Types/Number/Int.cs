@@ -28,10 +28,6 @@ public class ArcInt : IArcNumber
 			throw new Exception();
 		Value = new ArcInt(value.First.Value).Value;
 	}
-	public Block ToBlock()
-	{
-		return new Block(Value.ToString());
-	}
 	public bool Fulfills(IValue v)
 	{
 		if (v.TypeCode != TypeCode)
@@ -45,7 +41,36 @@ public class ArcInt : IArcNumber
 	}
 	public Walker Call(Walker i, ref List<string> result, Compiler comp)
 	{
-		result.Add(ToString());
+		bool Operated = false;
+		if(i.MoveNext())
+		{
+			if(i.Current == "+=")
+			{
+				if (i.MoveNext())
+				{
+					Value += int.Parse(i.Current);
+					Operated = true;
+				}
+				else
+					throw new Exception();
+			}
+			else if(i.Current == "-=")
+			{
+				if (i.MoveNext())
+				{
+					Value -= int.Parse(i.Current);
+					Operated = true;
+				}
+				else
+					throw new Exception();
+			}
+			else
+			{
+				i.MoveBack();
+			}
+		}
+		if(!Operated)
+			result.Add(ToString());
 		return i;
 	}
 	public double GetNum() => Value;

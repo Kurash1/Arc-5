@@ -8,7 +8,11 @@ namespace Arc;
 
 public partial class Compiler
 {
-	public Walker Var<T>(Walker i, Func<Block,T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
+	public Walker Var<T>(Walker i, Func<Block, T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
+	{
+		return Var(variables, i, Constructor, move, keyOverride);
+	}
+	public static Walker Var<T>(Dictionary<string, Pointer> vars, Walker i, Func<Block,T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
 	{
 		if(move)
 			i.MoveNext(); //The previous spot is the datatype
@@ -21,13 +25,13 @@ public partial class Compiler
 		if (value == null || value.First == null)
 			throw new Exception();
 
-		T Value;
-		if (value != null && value.Count == 1 && TryGetVariable(value.First.Value, out IValue? NewValue))
+		IValue Value;
+		if (value.Count == 1 && TryGetVariable(vars, value.First.Value, out Pointer? NewValue))
 		{
 			if (NewValue == null)
 				throw new Exception();
 
-			Value = Constructor(NewValue.ToBlock());
+			Value = NewValue.Value;
 		}
 		else {
 			if (value == null)
@@ -39,9 +43,9 @@ public partial class Compiler
 		if (keyOverride != null)
 			key = keyOverride;
 
-		(Dictionary<string, IValue> dict, string key) Val = GetNewVariable(key); //This will start as null
+		(Dictionary<string, Pointer> dict, string key) Val = GetNewVariable(vars, key); //This will start as null
 
-		Val.dict[Val.key] = Value;
+		Val.dict[Val.key] = new Pointer(ref Value);
 
 		return i;
 	}

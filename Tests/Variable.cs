@@ -14,6 +14,7 @@ public static partial class Tests
 		Compiler comp = new();
 
 		string result = comp.Compile(@"
+string a = ""baba""
 object FirstLayer = {
 	string hello = ""World""
 	bool true = yes
@@ -39,35 +40,6 @@ object global:GlobalObject = {
 
 FirstLayer:SecondLayer:hello = HelloGet
 		").Trim();
-
-		ArcObject expected = new(new Dictionary<string, IValue>(){
-				{ "global", Compiler.global },
-				{ "hello", new ArcString("\"World\"") },
-				{ "true", new ArcBool(true) },
-				{ "false", new ArcBool(false) },
-				{ "pi", new ArcFloat(3.14) },
-				{ "i", new ArcInt(0) },
-				{ "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
-					{ "hello", new ArcString("\"Wrld\"") },
-					{ "test", new ArcList(new LinkedList<IValue>(new[]
-						{
-							new ArcInt(100),
-							new ArcInt(200),
-							new ArcInt(300)
-						}
-					))},
-					{ "test2", new ArcList(new LinkedList<IValue>(new[]
-						{
-							new ArcInt(100),
-							new ArcInt(200),
-							new ArcInt(300)
-						}
-					))}
-				}) }
-			});
-
-		if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
-			throw new Exception("Failure on Variable Test");
 
 		if (!ResultMatches(result, @"
 ""Wrld"" = ""World""

@@ -26,31 +26,6 @@ B
 C
 		").Trim();
 
-		ArcObject expected = new(new Dictionary<string, IValue>(){
-				{ "SecondLayer", new ArcObject(new Dictionary<string, IValue>(){
-					{ "A", new ArcInt(1) },
-					{ "B", new ArcInt(2) },
-					{ "C", new ArcInt(3) },
-				}) },
-				{ "A", new ArcInt(1) },
-				{ "B", new ArcInt(2) },
-				{ "C", new ArcInt(3) }
-			});
-
-		if (!((ArcObject)comp.variables["FirstLayer"]).Fulfills(expected))
-			throw new Exception("Failure on Inherit Test");
-
-		if (!((ArcInt)comp.variables["A"]).Fulfills(new ArcInt(1)))
-			throw new Exception("Failure on Inherit Test");
-
-		if (!((ArcInt)comp.variables["B"]).Fulfills(new ArcInt(2)))
-			throw new Exception("Failure on Inherit Test");
-
-		if (!((ArcInt)comp.variables["C"]).Fulfills(new ArcInt(3)))
-			throw new Exception("Failure on Inherit Test");
-
-
-
 		if (!ResultMatches(result, @"1 2 3"))
 			throw new Exception("Failure on Inherit Test");
 

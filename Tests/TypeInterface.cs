@@ -18,9 +18,9 @@ interface country = {{
   type color = list
 }}
 country ade = {{
-  string name = ""Adelea""
-  string adj = ""Adelean""
-  list color = {{ 100 100 100 }}
+   name = ""Adelea""
+   adj = ""Adelean""
+   color = [ 100 100 100 ]
 }}
 
 
