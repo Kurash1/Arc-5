@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,41 +10,45 @@ namespace Arc;
 
 public class ArcObject : IArcEnumerable
 {
-	public ValueTypeCode TypeCode => ValueTypeCode.Object;
-	public Dictionary<string, Pointer> Properties;
+	//Regular Stuff
+	public Dictionary<string, IValue> Properties;
 	public ArcObject()
 	{
 		Properties = new();
 	}
-	public ArcObject(Dictionary<string, Pointer> value)
+	public ArcObject(Dictionary<string, IValue> value)
 	{
 		Properties = value;
 	}
-	public ArcObject(Block code, ArcInterface? Interface = null)
+	//Type Finding
+	public bool IsObject() => true;
+	public ArcObject AsObject() => this;
+	public IValue GetCopy() => new ArcObject(Properties);
+	//Contract
+	public IValue ThisConstruct(Block code) => Construct(code, Contract());
+	public static IValue Construct(Block code)
 	{
-		Properties = new Dictionary<string, Pointer>()
-		{
-			{ "global", new Pointer("global") }
-		};
+		return Construct(code, new());
+	}
+	public static IValue Construct(Block code, Dictionary<string, Func<Block, IValue>> Types)
+	{
+		ArcObject newValue = new();
+
+		newValue.Properties = new();
 
 		if (Parser.HasEnclosingBrackets(code))
 			code = Compiler.RemoveEnclosingBrackets(code);
 
-		if(code.Count == 0) return;
+		if (code.Count == 0) return newValue;
 
-		Dictionary<string, Func<Walker, bool, Walker>> keywords = new()
+		Dictionary<string, Func<Walker, Walker>> keywords = new()
 		{
-			{ "string", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcString(s), move) },
-			{ "bool", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcBool(s), move) },
-			{ "float", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcFloat(s), move) },
-			{ "int", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcInt(s), move) },
-			{ "object", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcObject(s), move) },
-			{ "block", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcBlock(s), move) },
-			{ "interface", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcInterface(s), move) },
-			{ "list", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcList(s), move) },
-			{ "array", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcArray(s), move) },
-			{ "type", (Walker i, bool move) => Compiler.Var(Properties, i, (Block s) => new ArcType(s), move) },
-			{ "inherit", (Walker i, bool _) => Compiler.Inherit(i, Properties) }
+			{ "string", (Walker i) => Compiler.Var(newValue.Properties, i, ArcString.Construct) },
+			{ "bool", (Walker i) => Compiler.Var(newValue.Properties, i, ArcBool.Construct) },
+			{ "float", (Walker i) => Compiler.Var(newValue.Properties, i, ArcFloat.Construct) },
+			{ "int", (Walker i) => Compiler.Var(newValue.Properties, i, ArcInt.Construct) },
+			{ "object", (Walker i) => Compiler.Var(newValue.Properties, i, ArcObject.Construct) },
+			{ "block", (Walker i) => Compiler.Var(newValue.Properties, i, ArcBlock.Construct) }
 		};
 
 		Walker i = new(code);
@@ -52,66 +57,47 @@ public class ArcObject : IArcEnumerable
 		{
 			if (keywords.ContainsKey(i.Current))
 			{
-				i = keywords[i.Current].Invoke(i, true);
+				i = keywords[i.Current](i);
 				continue;
 			}
-			else if(Interface != null && Interface.Properties.ContainsKey(i.Current))
+			else if (Types.ContainsKey(i.Current))
 			{
-				if(Interface[i.Current].Value.TypeCode == ValueTypeCode.Type)
-				{
-					i = keywords[
-							((ArcType)Interface[i.Current].Value).Type.ToString().ToLower()
-						].Invoke(i, false);
-				}
-				else
-				{
-					i = keywords[
-							Interface[i.Current].Value.TypeCode.ToString().ToLower()
-						].Invoke(i, false);
-				}
+				i = Compiler.Var(newValue.Properties, i, Types[i.Current], false);
+				continue;
 			}
 			else
 			{
-				Compiler.Var(Properties, i, (Block s) => IValue.Parse(s), false);
-				continue;
+				throw new Exception($"Unknown Datatype for {i.Current}");
 			}
 		} while (i.MoveNext());
-	}
-	public Walker Call(Walker i, ref List<string> result, Compiler comp)
-	{
-		throw new NotImplementedException();
-	}
-	public Pointer this[string key]
-	{
-		get
-		{
-			if (Properties.ContainsKey(key))
-				return Properties[key];
 
-			return null;
-		}
-		set
-		{
-			Properties[key] = value;
-		}
+		return newValue;
 	}
 	public bool Fulfills(IValue v)
 	{
-		if (v.TypeCode != TypeCode)
+		if (!v.IsObject())
 			return false;
-		foreach(KeyValuePair<string, Pointer> kvp in ((ArcObject)v).Properties)
-		{
-			if (kvp.Key == "global")
-				continue;
-			if (!Properties.ContainsKey(kvp.Key))
-				return false;
-			if(!Properties[kvp.Key].Value.Fulfills(kvp.Value.Value))
-				return false;
-		}
-		return true;
+		ArcObject a = v.AsObject();
+		return Properties == a.Properties;
 	}
-	public new static string ToString() => "[Arc Object]";
-
+	//Code
+	public Dictionary<string, Func<Block, IValue>> Contract()
+	{
+		Dictionary<string, Func<Block, IValue>> contract = new();
+		foreach(KeyValuePair<string, IValue> i in Properties)
+		{
+			contract.Add(i.Key, i.Value.ThisConstruct);
+		}
+		return contract;
+	}
+	public Walker Call(Walker i, ref List<string> result, Compiler comp)
+	{
+		return comp.Var(i, ThisConstruct);
+	}
+	public override string ToString()
+	{
+		return string.Join(' ', Properties);
+	}
 	public IEnumerator GetEnumerator()
 	{
 		return Properties.GetEnumerator();

@@ -16,6 +16,7 @@ public class Block : LinkedList<Word>
 	{
 
 	}
+	public void Add(string s) => AddLast(s);
 }
 public class Walker
 {

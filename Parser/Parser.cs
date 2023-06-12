@@ -27,6 +27,8 @@ public static partial class Parser
 	}
 	public static Block ParseCode(string str)
 	{
+		str = Regex.Replace(str, "#.*", "");
+
 		Block retval = new();
 		if (string.IsNullOrWhiteSpace(str)) return retval;
 		int ndx = 0;
@@ -49,6 +51,14 @@ public static partial class Parser
 		}
 		if (!string.IsNullOrWhiteSpace(s.Trim())) retval.AddLast(s.Trim());
 		return retval;
+	}
+	public static string ConvertStringToUtf8Bom(string source)
+	{
+		var data = Encoding.UTF8.GetBytes(source);
+		var result = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+		var encoder = new UTF8Encoding(true);
+
+		return encoder.GetString(result);
 	}
 	public static string FormatCode(string str)
 	{

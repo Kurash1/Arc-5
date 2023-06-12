@@ -13,6 +13,15 @@ public class Defines
 	private bool? Formatting;
 	private bool? Save;
 	private string? Headers;
+
+	public static Dictionary<string, Func<Block, IValue>> DefinesInterface = new()
+	{
+		{ "headers", ArcString.Construct },
+		{ "target", ArcString.Construct },
+		{ "formatting", ArcBool.Construct },
+		{ "save", ArcBool.Construct }
+	};
+
 	public Defines()
 	{
 
@@ -20,7 +29,10 @@ public class Defines
 	public Defines(string filepath)
 	{
 		string file = File.ReadAllText(filepath);
-		ArcObject defines = new(Parser.ParseCode(file));
+		ArcObject defines = ArcObject.Construct(
+			Parser.ParseCode(file),
+			DefinesInterface
+		).AsObject();
 
 		Set(defines);
 	}
@@ -29,21 +41,21 @@ public class Defines
 	{
 		if (defines.Properties.ContainsKey("headers"))
 		{
-			Headers = ((ArcString)defines["headers"].Value).Value.Trim('"');
+			Headers = defines.Properties["headers"].AsString().Value.Trim('"');
 		}
 
 		if (defines.Properties.ContainsKey("formatting"))
 		{
-			Formatting = ((ArcBool)defines["formatting"].Value).Value;
+			Formatting = defines.Properties["formatting"].AsBool().Value;
 		}
 		if (defines.Properties.ContainsKey("save"))
 		{
-			Save = ((ArcBool)defines["save"].Value).Value;
+			Save = defines.Properties["save"].AsBool().Value;
 		}
 
 		if (defines.Properties.ContainsKey("target"))
 		{
-			Target = ((ArcString)defines["target"].Value).Value.Trim('"');
+			Target = defines.Properties["target"].AsString().Value.Trim('"');
 		}
 	}
 	public bool GetFormatting()

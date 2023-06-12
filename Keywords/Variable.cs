@@ -12,12 +12,12 @@ public partial class Compiler
 	{
 		return Var(variables, i, Constructor, move, keyOverride);
 	}
-	public static Walker Var<T>(Dictionary<string, Pointer> vars, Walker i, Func<Block,T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
+	public static Walker Var<T>(Dictionary<string, IValue> vars, Walker i, Func<Block,T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
 	{
 		if(move)
 			i.MoveNext(); //The previous spot is the datatype
 
-		i = GetKeyValue(i, out string key, out Block? value);
+		i = GetKeyValue(i, out string key, out Block? value, out bool Copy);
 
 		if (!Parser.IsVariableKey(key))
 			throw new Exception("Invalid Variable Key");
@@ -26,12 +26,18 @@ public partial class Compiler
 			throw new Exception();
 
 		IValue Value;
-		if (value.Count == 1 && TryGetVariable(vars, value.First.Value, out Pointer? NewValue))
+		if (value.Count == 1 && TryGetVariable(vars, value.First.Value, out IValue? NewValue))
 		{
 			if (NewValue == null)
 				throw new Exception();
-
-			Value = NewValue.Value;
+			if (Copy)
+			{
+				Value = NewValue.GetCopy();
+			}
+			else
+			{
+				Value = NewValue;
+			}
 		}
 		else {
 			if (value == null)
@@ -43,9 +49,9 @@ public partial class Compiler
 		if (keyOverride != null)
 			key = keyOverride;
 
-		(Dictionary<string, Pointer> dict, string key) Val = GetNewVariable(vars, key); //This will start as null
+		(Dictionary<string, IValue> dict, string key) Val = GetNewVariable(vars, key); //This will start as null
 
-		Val.dict[Val.key] = new Pointer(ref Value);
+		Val.dict[Val.key] = new ArcPointer(ref Value);
 
 		return i;
 	}

@@ -7,4 +7,5 @@ namespace Arc;
 public interface IArcNumber : IValue
 {
 	public double GetNum();
+	new bool IsNumber() => true;
 }

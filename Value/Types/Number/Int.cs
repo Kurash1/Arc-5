@@ -7,9 +7,8 @@ namespace Arc;
 
 public class ArcInt : IArcNumber
 {
-	public ValueTypeCode TypeCode => ValueTypeCode.Int;
+	//Regular Stuff
 	public int Value { get; set; }
-
 	public ArcInt(int value)
 	{
 		Value = value;
@@ -28,52 +27,68 @@ public class ArcInt : IArcNumber
 			throw new Exception();
 		Value = new ArcInt(value.First.Value).Value;
 	}
+	public double GetNum() => Value;
+	//Type Finding
+	public ArcInt AsInt() => this;
+	public bool IsInt() => true;
+	public IValue GetCopy() => new ArcInt(Value);
+	//Contract
+	public static IValue Construct(Block s)
+	{
+		return new ArcInt(s);
+	}
+	public IValue ThisConstruct(Block s) => Construct(s);
 	public bool Fulfills(IValue v)
 	{
-		if (v.TypeCode != TypeCode)
+		if (!v.IsInt())
 			return false;
-		return ((ArcInt)v).Value == Value;
+		return v.AsInt().Value == Value;
 	}
 
+	//Code
+	public Walker Call(Walker i, ref List<string> result, Compiler comp)
+	{
+		if(i.MoveNext())
+		{
+			switch (i.Current)
+			{
+				case "+=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Value += int.Parse(i.Current);
+					}
+					break;
+				case "-=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Value -= int.Parse(i.Current);
+					}
+					break;
+				case "=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Compiler.GetScope(i, out Block scope);
+						Value = Construct(scope).AsInt().Value;
+					}
+					break;
+				default:
+					{
+						i.MoveBack();
+						result.Add(Value.ToString());
+					}
+					break;
+			}
+		}
+		return i;
+	}
 	public override string ToString()
 	{
 		return Value.ToString();
 	}
-	public Walker Call(Walker i, ref List<string> result, Compiler comp)
-	{
-		bool Operated = false;
-		if(i.MoveNext())
-		{
-			if(i.Current == "+=")
-			{
-				if (i.MoveNext())
-				{
-					Value += int.Parse(i.Current);
-					Operated = true;
-				}
-				else
-					throw new Exception();
-			}
-			else if(i.Current == "-=")
-			{
-				if (i.MoveNext())
-				{
-					Value -= int.Parse(i.Current);
-					Operated = true;
-				}
-				else
-					throw new Exception();
-			}
-			else
-			{
-				i.MoveBack();
-			}
-		}
-		if(!Operated)
-			result.Add(ToString());
-		return i;
-	}
-	public double GetNum() => Value;
-	public static implicit operator double(ArcInt d) => d.Value;
-	public static implicit operator ArcInt(int d) => new(d);
 }

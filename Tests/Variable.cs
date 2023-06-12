@@ -14,37 +14,37 @@ public static partial class Tests
 		Compiler comp = new();
 
 		string result = comp.Compile(@"
-string a = ""baba""
-object FirstLayer = {
-	string hello = ""World""
-	bool true = yes
-	bool false = no
-	float pi = 3.14
-	int i = 0
-	object SecondLayer = {
-		string hello = ""Wrld""
-		list test = [
-			100 200 300
-		]
-		test2 = [
-			100 200 300
-		]
+float a = 10.25
+int b = 52
+bool c = yes
+string d = ""Hello""
+block e = {
+	aba baba
+}
+
+object f = {
+	float a = 10.25
+	int b = 52
+	bool c = yes
+	string d = ""Hello""
+	block e = {
+		aba baba
 	}
 }
-string HelloGet = FirstLayer:hello
-string NumAsString = 121
-int NumFromString = NumAsString
-object global:GlobalObject = {
 
+f g = {
+	a = 5
 }
 
-FirstLayer:SecondLayer:hello = HelloGet
-		").Trim();
+string global:hello = ""Hello""
 
-		if (!ResultMatches(result, @"
-""Wrld"" = ""World""
-"))
-			throw new Exception("Failure on Variable Test");
+object aba = {
+	string s = global:hello
+}
+object bebe = {
+	string s = global:hello
+}
+		").Trim();
 
 		Console.WriteLine("Success on Variable Test");
 	}

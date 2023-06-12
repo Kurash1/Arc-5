@@ -58,28 +58,29 @@ public partial class Compiler
 		}
 		return i;
 	}
-	public static Walker TryGetKeyValue(Walker i, out string key, out Block? value)
+	public static Walker TryGetKeyValue(Walker i, out string key, out Block? value, out bool Copy)
 	{
 		key = i.Current;
 		
 		i.MoveNext();
 
-		if (!Parser.equal.IsMatch(i.Current))
+		Copy = (i.Current == "~");
+		if (!Parser.equal.IsMatch(i.Current) && i.Current != "~")
 		{
 			i.MoveBack();
 			value = null;
 			return i;
 		}
-
+		
 		i.MoveNext();
 
 		i = GetValue(i, out value);
 
 		return i;
 	}
-	public static Walker GetKeyValue(Walker i, out string key, out Block? value)
+	public static Walker GetKeyValue(Walker i, out string key, out Block? value, out bool Copy)
 	{
-		i = TryGetKeyValue(i, out key, out value);
+		i = TryGetKeyValue(i, out key, out value, out Copy);
 		if (value == null)
 			throw new Exception();
 		return i;
@@ -89,26 +90,26 @@ public partial class Compiler
 		return string.Join(" ", list);
 	}
 
-	public (Dictionary<string, Pointer> dict, string key) GetNewVariable(string locator)
+	public (Dictionary<string, IValue> dict, string key) GetNewVariable(string locator)
 	{
 		return GetNewVariable(variables, locator);
 	}
-	public static (Dictionary<string, Pointer> dict, string key) GetNewVariable(Dictionary<string, Pointer> vars, string locator)
+	public static (Dictionary<string, IValue> dict, string key) GetNewVariable(Dictionary<string, IValue> vars, string locator)
 	{
 		if (locator.Contains(':'))
 		{
 			string[] KeyLocator = locator.Split(':');
 			int f = 0;
-			Dictionary<string, Pointer> currentDict = vars;
+			Dictionary<string, IValue> currentDict = vars;
 			string currentKey;
 			do
 			{
 				currentKey = KeyLocator[f];
 				if (currentDict.ContainsKey(currentKey))
 				{
-					if (currentDict[currentKey].Value.TypeCode == ValueTypeCode.Object)
+					if (currentDict[currentKey].IsObject())
 					{
-						currentDict = ((ArcObject)currentDict[currentKey].Value).Properties;
+						currentDict = currentDict[currentKey].AsObject().Properties;
 					}
 					else
 					{
@@ -121,6 +122,10 @@ public partial class Compiler
 						}
 					}
 				}
+				else if(currentKey == "global")
+				{
+					currentDict = global.Properties;
+				}
 				f++;
 			} while (KeyLocator.Length > f);
 		
@@ -132,24 +137,25 @@ public partial class Compiler
 		}
 		else
 		{
-			if (!vars.ContainsKey(locator))
+			if (vars.ContainsKey(locator))
+				throw new Exception("Trying to assign with datatype to existing variable");
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-				vars.Add(locator, null);
+			vars.Add(locator, null);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 			return (vars, locator);
 		}
 	}
-	public bool TryGetVariable(string locator, out Pointer? var)
+	public bool TryGetVariable(string locator, out IValue? var)
 	{
 		return TryGetVariable(variables, locator, out var);
 	}
-	public static bool TryGetVariable(Dictionary<string, Pointer> vars, string locator, out Pointer? var)
+	public static bool TryGetVariable(Dictionary<string, IValue> vars, string locator, out IValue? var)
 	{
 		if (locator.Contains(':'))
 		{
 			string[] KeyLocator = locator.Split(':');
 			int f = 0;
-			Dictionary<string, Pointer> currentDict = vars;
+			Dictionary<string, IValue> currentDict = vars;
 			string currentKey;
 			do
 			{
@@ -158,11 +164,20 @@ public partial class Compiler
 				{
 					if (KeyLocator.Length > f + 1)
 					{
-						if (currentDict[currentKey].Value.TypeCode == ValueTypeCode.Object)
+						if (currentDict[currentKey].IsObject())
 						{
-							currentDict = ((ArcObject)currentDict[currentKey].Value).Properties;
+							currentDict = currentDict[currentKey].AsObject().Properties;
 						}
 					}
+					else
+					{
+						var = currentDict[currentKey];
+						return true;
+					}
+				}
+				else if(currentKey == "global")
+				{
+					currentDict = global.Properties;
 				}
 				else
 				{

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 namespace Arc;
 public class ArcFloat : IArcNumber
 {
-	public ValueTypeCode TypeCode => ValueTypeCode.Float;
+	//Regular Stuff
 	public double Value { get; set; }
-
 	public ArcFloat(double value)
 	{
 		Value = value;
@@ -27,22 +26,64 @@ public class ArcFloat : IArcNumber
 			throw new Exception();
 		Value = new ArcFloat(value.First.Value).Value;
 	}
-	public override string ToString()
-	{
-		return Value.ToString("0.000");
-	}
-	public Walker Call(Walker i, ref List<string> result, Compiler comp)
-	{
-		result.Add(ToString());
-		return i;
-	}
 	public double GetNum() => Value;
-	public static implicit operator double(ArcFloat d) => d.Value;
-	public static implicit operator ArcFloat(double d) => new(d);
+	//TypeFinding
+	public ArcFloat AsFloat() => this;
+	public bool IsFloat() => true;
+	public IValue GetCopy() => new ArcFloat(Value);
+	//Contract
+	public static IValue Construct(Block s) => new ArcFloat(s);
+	public IValue ThisConstruct(Block s) => Construct(s);
 	public bool Fulfills(IValue v)
 	{
-		if (v.TypeCode != TypeCode)
+		if (!v.IsFloat())
 			return false;
-		return ((ArcFloat)v).Value == Value;
+		return v.AsFloat().Value == Value;
+	}
+	//Code
+	public Walker Call(Walker i, ref List<string> result, Compiler comp)
+	{
+		if (i.MoveNext())
+		{
+			switch (i.Current)
+			{
+				case "+=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Value += float.Parse(i.Current);
+					}
+					break;
+				case "-=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Value -= float.Parse(i.Current);
+					}
+					break;
+				case "=":
+					{
+						if (!i.MoveNext())
+							throw new Exception();
+
+						Compiler.GetScope(i, out Block scope);
+						Value = Construct(scope).AsFloat().Value;
+					}
+					break;
+				default:
+					{
+						i.MoveBack();
+						result.Add(Value.ToString("0.000"));
+					}
+					break;
+			}
+		}
+		return i;
+	}
+	public override string ToString()
+	{
+		return Value.ToString();
 	}
 }

@@ -6,15 +6,13 @@ using System.Linq;
 
 using ArcInstance;
 using System.Text;
+using Microsoft.VisualBasic;
 
 namespace Arc
 {
 	public partial class Compiler
 	{
-	   public Dictionary<string, Pointer> variables = new()
-		{
-			{ "global", new Pointer("global") }
-		};
+		public Dictionary<string, IValue> variables = new();
 		public static ArcObject global = new();
 
 #pragma warning disable CS8618 // Fields are assigned by Arc5.cs
@@ -41,21 +39,21 @@ namespace Arc
 			List<string> result = new();
 			Dictionary<string, Func<Walker, Walker>> keywords = new()
 			{
-				{ "string", (Walker i) => Var(i, (Block s) => new ArcString(s) ) },
-				{ "bool", (Walker i) => Var(i, (Block s) => new ArcBool(s) ) },
-				{ "float", (Walker i) => Var(i, (Block s) => new ArcFloat(s) ) },
-				{ "int", (Walker i) => Var(i, (Block s) => new ArcInt(s) ) },
-				{ "var", (Walker i) => Var(i, (Block s) => IValue.Parse(s) ) },
-				{ "object", (Walker i) => Var(i, (Block s) => new ArcObject(s) ) },
-				{ "block", (Walker i) => Var(i, (Block s) => new ArcBlock(s) ) },
-				{ "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
-				{ "list", (Walker i) => Var(i, (Block s) => new ArcList(s) ) },
-				{ "array", (Walker i) => Var(i, (Block s) => new ArcArray(s) ) },
-				{ "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },
-				{ "inherit", (Walker i) => Inherit(i) },
-				{ "require", (Walker i) => Require(i) },
+				{ "string", (Walker i) => Var(i, ArcString.Construct ) },
+				{ "bool", (Walker i) => Var(i, ArcBool.Construct ) },
+				{ "float", (Walker i) => Var(i, ArcFloat.Construct ) },
+				{ "int", (Walker i) => Var(i, ArcInt.Construct ) },
+				{ "object", (Walker i) => Var(i, ArcObject.Construct ) },
+				{ "block", (Walker i) => Var(i, ArcBlock.Construct ) },
+				//{ "interface", (Walker i) => Var(i, (Block s) => new ArcInterface(s) ) },
+				//{ "list", (Walker i) => Var(i, ArcList.Construct ) },
+				//{ "array", (Walker i) => Var(i, (Block s) => new ArcArray(s) ) },
+				//{ "type", (Walker i) => Var(i, (Block s) => new ArcType(s) ) },
+				//{ "inherit", (Walker i) => Inherit(i) },
+				//{ "require", (Walker i) => Require(i) },
 				{ "foreach", (Walker i) => Foreach(i, ref result) },
 				{ "run", (Walker i) => Run(i) },
+				{ "save_as_provinces", (Walker i) => SaveAsProvinces(i) },
 			};
 
 			Walker g = new(code);
@@ -66,11 +64,11 @@ namespace Arc
 					g = keywords[g.Current].Invoke(g);
 					continue;
 				}
-				else if (TryGetVariable(g.Current, out Pointer? variable))
+				else if (TryGetVariable(g.Current, out IValue? variable))
 				{
 					if(variable != null)
 					{
-						g = variable.Value.Call(g, ref result, this);
+						g = variable.Call(g, ref result, this);
 					}
 					continue;
 				}
@@ -87,6 +85,10 @@ namespace Arc
 					result.Add(newValue);
 					continue;
 				}
+				else if(g.Current == "\\n")
+				{
+					result.Add(Environment.NewLine);
+				}
 
 				result.Add(g.Current);
 			} while (g.MoveNext());
@@ -94,7 +96,7 @@ namespace Arc
 			StringBuilder res = new();
 			foreach (string s in result)
 			{
-				res.Append($"{s.Trim()} ");
+				res.Append($"{s} ");
 			}
 
 			if (def.GetFormatting())

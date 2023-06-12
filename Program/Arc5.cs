@@ -28,7 +28,7 @@ namespace ArcInstance
 				Compiler.owner = this;
 
 #if DEBUG
-				//ArcTests.Tests.VariableTest();
+				ArcTests.Tests.VariableTest();
 				//ArcTests.Tests.InheritTest();
 				//ArcTests.Tests.TypeAndInterfaceTest();
 				//ArcTests.Tests.RequireTest();
@@ -53,7 +53,7 @@ namespace ArcInstance
 		public static void TranspileTarget(Defines def)
 		{
 			string fileLocation = Path.Combine(directory, def.GetTarget());
-
+		
 			if (fileLocation.EndsWith("/"))
 			{
 				string[] files = Directory.GetFiles(fileLocation);

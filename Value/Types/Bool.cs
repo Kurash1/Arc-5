@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Arc;
-
 public class ArcBool : IValue
 {
-	public ValueTypeCode TypeCode => ValueTypeCode.Bool;
+	//Regular Stuff
 	public bool Value { get; set; }
 
 	public ArcBool(bool value)
@@ -31,24 +30,49 @@ public class ArcBool : IValue
 			throw new Exception();
 		Value = new ArcBool(value.First.Value).Value;
 	}
-	public override string ToString()
-	{
-		string value = Value.ToString();
-		value = value.Replace("true", "yes");
-		value = value.Replace("false", "no");
-		return value;
+	//Type Finding
+	public ArcBool AsBool() => this;
+	public bool IsBool() => true;
+	public IValue GetCopy() => new ArcBool(Value);
+	//Contract
+	public static IValue Construct(Block s) 
+	{ 
+		return new ArcBool(s);
 	}
-	public static implicit operator bool(ArcBool d) => d.Value;
-	public static implicit operator ArcBool(bool d) => new(d);
+	public IValue ThisConstruct(Block s)
+	{
+		return Construct(s);
+	}
 	public bool Fulfills(IValue v)
 	{
-		if (v.TypeCode != TypeCode)
+		if (!v.IsBool())
 			return false;
-		return ((ArcBool)v).Value == Value;
+		return v.AsBool().Value == Value;
 	}
+	//Code
 	public Walker Call(Walker i, ref List<string> result, Compiler comp)
 	{
-		result.Add(ToString().Replace("True", "yes").Replace("False", "no"));
+		if (i.MoveNext())
+		{
+			if (i.Current == "=")
+			{
+				if (!i.MoveNext())
+					throw new Exception();
+
+				Compiler.GetScope(i, out Block scope);
+				Value = Construct(scope).AsBool().Value;
+			}
+			else
+			{
+				i.MoveBack();
+				result.Add(ToString().Replace("True", "yes").Replace("False", "no"));
+			}
+		}
+
 		return i;
+	}
+	public override string ToString()
+	{
+		return Value.ToString();
 	}
 }
