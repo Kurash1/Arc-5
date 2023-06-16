@@ -32,8 +32,8 @@ public class ArcFloat : IArcNumber
 	public bool IsFloat() => true;
 	public IValue GetCopy() => new ArcFloat(Value);
 	//Contract
-	public static IValue Construct(Block s) => new ArcFloat(s);
-	public IValue ThisConstruct(Block s) => Construct(s);
+	public static IValue Construct(Block s, Dictionary<string, IValue>? vars) => new ArcFloat(s);
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars) => Construct(s, vars);
 	public bool Fulfills(IValue v)
 	{
 		if (!v.IsFloat())
@@ -63,13 +63,13 @@ public class ArcFloat : IArcNumber
 						Value -= float.Parse(i.Current);
 					}
 					break;
-				case "=":
+				case ":=":
 					{
 						if (!i.MoveNext())
 							throw new Exception();
 
 						Compiler.GetScope(i, out Block scope);
-						Value = Construct(scope).AsFloat().Value;
+						Value = Construct(scope, comp.variables).AsFloat().Value;
 					}
 					break;
 				default:

@@ -8,11 +8,11 @@ namespace Arc;
 
 public partial class Compiler
 {
-	public Walker Var<T>(Walker i, Func<Block, T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
+	public Walker Var<T>(Walker i, Func<Block, Dictionary<string, IValue>?, T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
 	{
-		return Var(variables, i, Constructor, move, keyOverride);
+		return Var(variables, variables, i, Constructor, move, keyOverride);
 	}
-	public static Walker Var<T>(Dictionary<string, IValue> vars, Walker i, Func<Block,T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
+	public static Walker Var<T>(Dictionary<string, IValue> props, Dictionary<string, IValue>? vars, Walker i, Func<Block,Dictionary<string, IValue>?, T> Constructor, bool move = true, string? keyOverride = null) where T : IValue
 	{
 		if(move)
 			i.MoveNext(); //The previous spot is the datatype
@@ -26,7 +26,7 @@ public partial class Compiler
 			throw new Exception();
 
 		IValue Value;
-		if (value.Count == 1 && TryGetVariable(vars, value.First.Value, out IValue? NewValue))
+		if (value.Count == 1 && vars != null && TryGetVariable(vars, value.First.Value, out IValue? NewValue))
 		{
 			if (NewValue == null)
 				throw new Exception();
@@ -43,13 +43,13 @@ public partial class Compiler
 			if (value == null)
 				throw new Exception();
 
-			Value = Constructor(value);
+			Value = Constructor(value, vars);
 		}
 
 		if (keyOverride != null)
 			key = keyOverride;
 
-		(Dictionary<string, IValue> dict, string key) Val = GetNewVariable(vars, key); //This will start as null
+		(Dictionary<string, IValue> dict, string key) Val = GetNewVariable(props, key); //This will start as null
 
 		Val.dict[Val.key] = new ArcPointer(ref Value);
 

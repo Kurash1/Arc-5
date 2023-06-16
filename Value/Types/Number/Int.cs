@@ -33,11 +33,11 @@ public class ArcInt : IArcNumber
 	public bool IsInt() => true;
 	public IValue GetCopy() => new ArcInt(Value);
 	//Contract
-	public static IValue Construct(Block s)
+	public static IValue Construct(Block s, Dictionary<string, IValue>? vars)
 	{
 		return new ArcInt(s);
 	}
-	public IValue ThisConstruct(Block s) => Construct(s);
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars) => Construct(s, vars);
 	public bool Fulfills(IValue v)
 	{
 		if (!v.IsInt())
@@ -68,13 +68,13 @@ public class ArcInt : IArcNumber
 						Value -= int.Parse(i.Current);
 					}
 					break;
-				case "=":
+				case ":=":
 					{
 						if (!i.MoveNext())
 							throw new Exception();
 
 						Compiler.GetScope(i, out Block scope);
-						Value = Construct(scope).AsInt().Value;
+						Value = Construct(scope, comp.variables).AsInt().Value;
 					}
 					break;
 				default:
@@ -84,6 +84,10 @@ public class ArcInt : IArcNumber
 					}
 					break;
 			}
+		}
+		else
+		{
+			result.Add(Value.ToString());
 		}
 		return i;
 	}

@@ -20,11 +20,11 @@ public class ArcString : IValue
 	public ArcString AsString() => this;
 	public IValue GetCopy() => new ArcString(Value);
 	//Contract
-	public IValue ThisConstruct(Block s) => Construct(s);
-	public static IValue Construct(Block s)
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars) => Construct(s, vars);
+	public static IValue Construct(Block s, Dictionary<string, IValue>? vars)
 	{
 		string NewString = string.Join(' ', s);
-		ArcString NewArcString = new ArcString(NewString);
+		ArcString NewArcString = new(NewString);
 		return NewArcString;
 	}
 	public bool Fulfills(IValue v)
@@ -40,13 +40,13 @@ public class ArcString : IValue
 	{
 		if (i.MoveNext())
 		{
-			if(i.Current == "=")
+			if(i.Current == ":=")
 			{
 				if (!i.MoveNext())
 					throw new Exception();
 
 				Compiler.GetScope(i, out Block scope);
-				Value = Construct(scope).AsString().Value;
+				Value = Construct(scope, comp.variables).AsString().Value;
 			}
 			else
 			{

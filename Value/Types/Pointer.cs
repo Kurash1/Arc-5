@@ -37,10 +37,10 @@ public class ArcPointer : IValue
 
 	public IValue GetOrigin() => Value.GetOrigin();
 	//Contract
-	public IValue ThisConstruct(Block s) => Construct(s);
-	public IValue Construct(Block s)
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars) => Construct(s, vars);
+	public IValue Construct(Block s, Dictionary<string, IValue>? vars)
 	{
-		return Value.ThisConstruct(s);
+		return Value.ThisConstruct(s, vars);
 	}
 	public bool Fulfills(IValue v)
 	{

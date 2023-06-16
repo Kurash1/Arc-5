@@ -25,16 +25,27 @@ public class ArcObject : IArcEnumerable
 	public ArcObject AsObject() => this;
 	public IValue GetCopy() => new ArcObject(Properties);
 	//Contract
-	public IValue ThisConstruct(Block code) => Construct(code, Contract());
-	public static IValue Construct(Block code)
-	{
-		return Construct(code, new());
+	public IValue ThisConstruct(Block code, Dictionary<string, IValue>? vars) {
+		ArcObject t = Construct(code, Contract(), vars).AsObject();
+		foreach(KeyValuePair<string, IValue> pair in Properties)
+		{
+			if(!t.Properties.ContainsKey(pair.Key))
+			{
+				t.Properties.Add(pair.Key, new ArcPointer(pair.Value));
+			}
+		}
+		return t;
 	}
-	public static IValue Construct(Block code, Dictionary<string, Func<Block, IValue>> Types)
+	public static IValue Construct(Block code, Dictionary<string, IValue>? vars)
 	{
-		ArcObject newValue = new();
-
-		newValue.Properties = new();
+		return Construct(code, new(), vars);
+	}
+	public static IValue Construct(Block code, Dictionary<string, Func<Block, Dictionary<string, IValue>?, IValue>> Types, Dictionary<string, IValue>? vars)
+	{
+		ArcObject newValue = new()
+		{
+			Properties = new()
+		};
 
 		if (Parser.HasEnclosingBrackets(code))
 			code = Compiler.RemoveEnclosingBrackets(code);
@@ -43,12 +54,12 @@ public class ArcObject : IArcEnumerable
 
 		Dictionary<string, Func<Walker, Walker>> keywords = new()
 		{
-			{ "string", (Walker i) => Compiler.Var(newValue.Properties, i, ArcString.Construct) },
-			{ "bool", (Walker i) => Compiler.Var(newValue.Properties, i, ArcBool.Construct) },
-			{ "float", (Walker i) => Compiler.Var(newValue.Properties, i, ArcFloat.Construct) },
-			{ "int", (Walker i) => Compiler.Var(newValue.Properties, i, ArcInt.Construct) },
-			{ "object", (Walker i) => Compiler.Var(newValue.Properties, i, ArcObject.Construct) },
-			{ "block", (Walker i) => Compiler.Var(newValue.Properties, i, ArcBlock.Construct) }
+			{ "string", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcString.Construct) },
+			{ "bool", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcBool.Construct) },
+			{ "float", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcFloat.Construct) },
+			{ "int", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcInt.Construct) },
+			{ "object", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcObject.Construct) },
+			{ "block", (Walker i) => Compiler.Var(newValue.Properties, vars, i, ArcBlock.Construct) }
 		};
 
 		Walker i = new(code);
@@ -62,7 +73,15 @@ public class ArcObject : IArcEnumerable
 			}
 			else if (Types.ContainsKey(i.Current))
 			{
-				i = Compiler.Var(newValue.Properties, i, Types[i.Current], false);
+				i = Compiler.Var(newValue.Properties, vars, i, Types[i.Current], false);
+				continue;
+			}
+			else if(Compiler.TryGetVariable(vars, i.Current, out IValue? var))
+			{
+				if (var == null)
+					throw new Exception();
+
+				i = Compiler.Var(newValue.Properties, vars, i, var.ThisConstruct);
 				continue;
 			}
 			else
@@ -81,9 +100,9 @@ public class ArcObject : IArcEnumerable
 		return Properties == a.Properties;
 	}
 	//Code
-	public Dictionary<string, Func<Block, IValue>> Contract()
+	public Dictionary<string, Func<Block, Dictionary<string, IValue>?, IValue>> Contract()
 	{
-		Dictionary<string, Func<Block, IValue>> contract = new();
+		Dictionary<string, Func<Block, Dictionary<string, IValue>?, IValue>> contract = new();
 		foreach(KeyValuePair<string, IValue> i in Properties)
 		{
 			contract.Add(i.Key, i.Value.ThisConstruct);

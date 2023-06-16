@@ -10,14 +10,16 @@ public class Defines
 {
 	public static Defines Global = new();
 	private string? Target;
+	private string? As;
 	private bool? Formatting;
 	private bool? Save;
 	private string? Headers;
 
-	public static Dictionary<string, Func<Block, IValue>> DefinesInterface = new()
+	public static Dictionary<string, Func<Block, Dictionary<string, IValue>?, IValue>> DefinesInterface = new()
 	{
 		{ "headers", ArcString.Construct },
 		{ "target", ArcString.Construct },
+		{ "as", ArcString.Construct },
 		{ "formatting", ArcBool.Construct },
 		{ "save", ArcBool.Construct }
 	};
@@ -31,7 +33,8 @@ public class Defines
 		string file = File.ReadAllText(filepath);
 		ArcObject defines = ArcObject.Construct(
 			Parser.ParseCode(file),
-			DefinesInterface
+			DefinesInterface,
+			null
 		).AsObject();
 
 		Set(defines);
@@ -57,6 +60,11 @@ public class Defines
 		{
 			Target = defines.Properties["target"].AsString().Value.Trim('"');
 		}
+		if (defines.Properties.ContainsKey("as"))
+		{
+			As = defines.Properties["as"].AsString().Value.Trim('"');
+		}
+
 	}
 	public bool GetFormatting()
 	{
@@ -97,5 +105,11 @@ public class Defines
 		if(Global.Target != null)
 			return Global.Target;
 		throw new Exception();
+	}
+	public string? GetAs()
+	{
+		if (As != null)
+			return As;
+		return null;
 	}
 }

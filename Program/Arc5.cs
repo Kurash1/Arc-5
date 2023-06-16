@@ -61,7 +61,11 @@ namespace ArcInstance
 				{
 					Compiler comp = new();
 					string fileContent = File.ReadAllText(file);
-					string newFileLocation = file.Replace(".arc", ".txt");
+					string? newFileLocation = def.GetAs();
+					if (newFileLocation != null)
+						newFileLocation = Path.Combine(directory, newFileLocation);
+					else
+						newFileLocation = file.Replace(".arc", ".txt");
 					Transpile(comp, newFileLocation, fileContent, def);
 				}
 			}
@@ -69,7 +73,11 @@ namespace ArcInstance
 			{
 				Compiler comp = new();
 				string file = File.ReadAllText(fileLocation);
-				string newFileLocation = fileLocation.Replace(".arc", ".txt");
+				string? newFileLocation = def.GetAs();
+				if (newFileLocation != null)
+					newFileLocation = Path.Combine(directory, newFileLocation);
+				else
+					newFileLocation = fileLocation.Replace(".arc", ".txt");
 				Transpile(comp, newFileLocation, file, def);
 			}
 		}

@@ -149,18 +149,18 @@ public partial class Compiler
 	{
 		return TryGetVariable(variables, locator, out var);
 	}
-	public static bool TryGetVariable(Dictionary<string, IValue> vars, string locator, out IValue? var)
+	public static bool TryGetVariable(Dictionary<string, IValue>? vars, string locator, out IValue? var)
 	{
 		if (locator.Contains(':'))
 		{
 			string[] KeyLocator = locator.Split(':');
 			int f = 0;
-			Dictionary<string, IValue> currentDict = vars;
+			Dictionary<string, IValue>? currentDict = vars;
 			string currentKey;
 			do
 			{
 				currentKey = KeyLocator[f];
-				if (currentDict.ContainsKey(currentKey))
+				if (currentDict != null && currentDict.ContainsKey(currentKey))
 				{
 					if (KeyLocator.Length > f + 1)
 					{
@@ -196,7 +196,12 @@ public partial class Compiler
 		}
 		else
 		{
-			if (!vars.ContainsKey(locator))
+			if(vars == null)
+			{
+				var = null;
+				return false;
+			}
+			else if (!vars.ContainsKey(locator))
 			{
 				var = null;
 				return false;

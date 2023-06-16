@@ -62,13 +62,19 @@ public static partial class Parser
 	}
 	public static string FormatCode(string str)
 	{
+		if (str == null)
+			return "";
 		MatchCollection matches = formatter.Matches(str);
 
-		string[] vs = matches.Select(m => m.Value).ToArray();
+		List<string> vs = matches.Select(m => m.Value).ToList();
 		int indent = 0;
-		for (int i = 0; i < vs.Length; i++)
+		for (int i = 0; i < vs.Count; i++)
 		{
-			if (vs[i].EndsWith('{'))
+			if (vs[i].StartsWith("#"))
+			{
+				vs[i] = vs[i].Prepend(indent, '\t');
+			}
+			else if (vs[i].EndsWith('{'))
 			{
 				vs[i] = vs[i].Prepend(indent, '\t');
 				indent++;
@@ -76,6 +82,8 @@ public static partial class Parser
 			else if (vs[i].EndsWith('}'))
 			{
 				indent--;
+				if (indent < 0)
+					throw new Exception();
 				vs[i] = vs[i].Prepend(indent, '\t');
 			}
 			else

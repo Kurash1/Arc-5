@@ -31,8 +31,8 @@ public interface IValue
 
 	public IValue GetCopy();
 
-	public static IValue Construct(Block s) { throw new NotImplementedException(); }
-	public IValue ThisConstruct(Block s);
+	public static IValue Construct(Block s, Dictionary<string, IValue>? vars) { throw new NotImplementedException(); }
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars);
 	public bool Fulfills(IValue v);
 	public Walker Call(Walker i, ref List<string> result, Compiler comp);
 

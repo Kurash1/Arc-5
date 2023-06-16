@@ -16,6 +16,29 @@ public class Block : LinkedList<Word>
 	{
 
 	}
+	public Block ExtractFirstSubBlock(string? key = null)
+	{
+		if(key != null)
+		{
+			Dictionary<string, IValue> ret = new();
+			Compiler.Var(ret, null, new(this), ArcBlock.Construct, false, key);
+			Block ret2 = ret[key].AsBlock().Value;
+			for(int i = 0; i < (ret2.Count + 4); i++)
+			{
+				RemoveFirst();
+			}
+			return ret2;
+		}
+		else
+		{
+			Compiler.GetScope(new(this), out Block scope);
+			for (int i = 0; i < scope.Count; i++)
+			{
+				RemoveFirst();
+			}
+			return scope;
+		}
+	}
 	public void Add(string s) => AddLast(s);
 }
 public class Walker

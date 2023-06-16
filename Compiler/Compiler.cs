@@ -23,8 +23,7 @@ namespace Arc
 		public Compiler() { }
 		public string Compile(string file, bool preprocessor = false, Defines? def = null)
 		{
-			if (def == null)
-				def = Defines.Global;
+			def ??= Defines.Global;
 
 			if (preprocessor)
 				file = Parser.Preprocessor(file);
@@ -33,9 +32,11 @@ namespace Arc
 		}
 		public string Compile(Block code, Defines? def = null)
 		{
-			if (def == null)
-				def = Defines.Global;
-			
+			def ??= Defines.Global;
+
+			if (code.Count == 0)
+				return "";
+
 			List<string> result = new();
 			Dictionary<string, Func<Walker, Walker>> keywords = new()
 			{
@@ -54,6 +55,7 @@ namespace Arc
 				{ "foreach", (Walker i) => Foreach(i, ref result) },
 				{ "run", (Walker i) => Run(i) },
 				{ "save_as_provinces", (Walker i) => SaveAsProvinces(i) },
+				{ "save", (Walker i) => Save(i) },
 			};
 
 			Walker g = new(code);

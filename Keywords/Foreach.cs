@@ -37,7 +37,16 @@ public partial class Compiler
 	
 		if (Parser.HasEnclosingBrackets(codeblock))
 			RemoveEnclosingBrackets(codeblock);
-	
+
+		if (codeblock.First == null)
+			throw new Exception();
+
+		Block? whereBlock = null;
+		if (codeblock.First.Value == "where")
+		{
+			whereBlock = codeblock.ExtractFirstSubBlock("where");
+		}
+
 		if(enumerableObject.IsObject())
 		{
 			foreach (KeyValuePair<string, IValue> kvp in enumerableObject.AsObject())
@@ -48,11 +57,21 @@ public partial class Compiler
 					{ "value", kvp.Value }
 				});
 				dict[key] = new ArcPointer(ref NewValue);
+				
+				if(whereBlock == null)
+				{
+					result.Add(Compile(codeblock));
+				}
+				else
+				{
+					if (Logic(whereBlock))
+					{
+						result.Add(Compile(codeblock));
+					}
+				}
 	
-				result.Add(Compile(codeblock));
-	
-				dict.Remove(key);
 			}
+			dict.Remove(key);
 		}
 		//else if(enumerableObject.Value.TypeCode == ValueTypeCode.List)
 		//{

@@ -35,13 +35,13 @@ public class ArcBool : IValue
 	public bool IsBool() => true;
 	public IValue GetCopy() => new ArcBool(Value);
 	//Contract
-	public static IValue Construct(Block s) 
+	public static IValue Construct(Block s, Dictionary<string, IValue>? vars) 
 	{ 
 		return new ArcBool(s);
 	}
-	public IValue ThisConstruct(Block s)
+	public IValue ThisConstruct(Block s, Dictionary<string, IValue>? vars)
 	{
-		return Construct(s);
+		return Construct(s, vars);
 	}
 	public bool Fulfills(IValue v)
 	{
@@ -60,7 +60,7 @@ public class ArcBool : IValue
 					throw new Exception();
 
 				Compiler.GetScope(i, out Block scope);
-				Value = Construct(scope).AsBool().Value;
+				Value = Construct(scope, comp.variables).AsBool().Value;
 			}
 			else
 			{

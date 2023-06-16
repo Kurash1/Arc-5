@@ -15,7 +15,7 @@ public partial class Compiler
 		if (value == null)
 			throw new Exception();
 
-		ArcObject Right = ArcObject.Construct(value, Defines.DefinesInterface).AsObject();
+		ArcObject Right = ArcObject.Construct(value, Defines.DefinesInterface, null).AsObject();
 	
 		if (!Right.Properties.ContainsKey("target"))
 			throw new Exception();
